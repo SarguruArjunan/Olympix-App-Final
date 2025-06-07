@@ -1,4 +1,4 @@
-# PS Olympics Web Application
+# PS Olympix Web Application
 
 A web application for tracking multi-sport events in an Olympics-style format.
 
