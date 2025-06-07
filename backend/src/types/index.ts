@@ -1,0 +1,61 @@
+export interface Sport {
+  ID: number;
+  Name: string;
+  Icon_URL: string;
+  Description: string;
+}
+
+export interface Team {
+  ID: number;
+  Name: string;
+  Country: string;
+  Logo_URL: string;
+}
+
+export interface Player {
+  ID: number;
+  FirstName: string;
+  LastName: string;
+  TeamID: number;
+  SportID: number;
+}
+
+export interface Event {
+  ID: number;
+  SportID: number;
+  Name: string;
+  Date: string;
+  Time: string;
+  Location: string;
+}
+
+export interface Match {
+  ID: number;
+  EventID: number;
+  ParticipantA_ID: number;
+  ParticipantB_ID: number;
+  ScoreA: string | number;
+  ScoreB: string | number;
+  WinnerID: number;
+  Status: 'Scheduled' | 'In Progress' | 'Completed';
+}
+
+export interface Medal {
+  ID: number;
+  TeamID: number;
+  SportID: number;
+  Gold: number;
+  Silver: number;
+  Bronze: number;
+  Total: number;
+}
+
+export type SheetName = 'Sports' | 'Teams' | 'Players' | 'Events' | 'Matches' | 'Medals';
+
+export type SheetData = Sport | Team | Player | Event | Match | Medal;
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+}

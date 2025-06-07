@@ -1,0 +1,22 @@
+{
+  "Teams": [
+    {
+      "ID": 1,
+      "Name": "Alpha Squad",
+      "Country": "USA",
+      "Logo_URL": "/images/teams/alpha.png"
+    },
+    {
+      "ID": 2,
+      "Name": "Beta Warriors",
+      "Country": "UK",
+      "Logo_URL": "/images/teams/beta.png"
+    },
+    {
+      "ID": 3,
+      "Name": "Gamma Force",
+      "Country": "Germany",
+      "Logo_URL": "/images/teams/gamma.png"
+    }
+  ]
+}

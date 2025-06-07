@@ -1,0 +1,108 @@
+{
+  "Sports": [
+    {
+      "ID": 1,
+      "Name": "Foosball",
+      "Icon_URL": "/icons/foosball.svg",
+      "Description": "Table soccer played with rods and miniature players, requiring quick reflexes and strategic play."
+    },
+    {
+      "ID": 2,
+      "Name": "Carrom",
+      "Icon_URL": "/icons/carrom.svg",
+      "Description": "Fast-paced tabletop game where players flick discs into pockets, combining skill and strategy."
+    },
+    {
+      "ID": 3,
+      "Name": "Chess",
+      "Icon_URL": "/icons/chess.svg",
+      "Description": "Classic strategic board game of kings and queens, testing players' tactical thinking."
+    },
+    {
+      "ID": 4,
+      "Name": "Table Tennis",
+      "Icon_URL": "/icons/table-tennis.svg",
+      "Description": "Fast-paced racket sport played on a table, demanding quick reflexes and precision."
+    },
+    {
+      "ID": 5,
+      "Name": "Badminton",
+      "Icon_URL": "/icons/badminton.svg",
+      "Description": "High-energy racket sport played with a shuttlecock, requiring agility and tactical play."
+    },
+    {
+      "ID": 6,
+      "Name": "Cricket",
+      "Icon_URL": "/icons/cricket.svg",
+      "Description": "Team sport played with bat and ball, combining individual skill with team strategy."
+    },
+    {
+      "ID": 7,
+      "Name": "Football",
+      "Icon_URL": "/icons/football.svg",
+      "Description": "The beautiful game played between two teams of eleven players each."
+    },
+    {
+      "ID": 8,
+      "Name": "Basketball",
+      "Icon_URL": "/icons/basketball.svg",
+      "Description": "Fast-paced team sport played with a ball and hoop, requiring coordination and teamwork."
+    },
+    {
+      "ID": 9,
+      "Name": "Lemon Spoon Race",
+      "Icon_URL": "/icons/lemon-spoon.svg",
+      "Description": "Fun relay race where participants balance a lemon on a spoon while running."
+    }
+  ],
+  "Events": [
+    {
+      "ID": 1,
+      "SportID": 1,
+      "Name": "Foosball Tournament - Round 1",
+      "Date": "2025-07-01",
+      "Time": "10:00:00",
+      "Location": "Game Room A"
+    },
+    {
+      "ID": 2,
+      "SportID": 2,
+      "Name": "Carrom Championship",
+      "Date": "2025-07-01",
+      "Time": "14:00:00",
+      "Location": "Indoor Arena"
+    },
+    {
+      "ID": 3,
+      "SportID": 3,
+      "Name": "Chess Masters Series",
+      "Date": "2025-07-02",
+      "Time": "09:00:00",
+      "Location": "Strategy Hall"
+    },
+    {
+      "ID": 4,
+      "SportID": 4,
+      "Name": "Table Tennis Singles",
+      "Date": "2025-07-02",
+      "Time": "13:00:00",
+      "Location": "Sports Complex B"
+    },
+    {
+      "ID": 5,
+      "SportID": 5,
+      "Name": "Badminton Mixed Doubles",
+      "Date": "2025-07-03",
+      "Time": "11:00:00",
+      "Location": "Court 1"
+    },
+    {
+      "ID": 6,
+      "SportID": 6,
+      "Name": "Cricket T20 Match",
+      "Date": "2025-07-03",
+      "Time": "15:00:00",
+      "Location": "Main Ground"
+    }
+  ]
+}
