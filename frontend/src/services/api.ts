@@ -1,48 +1,110 @@
 import { Sport, Team, Medal, Event, Player, ApiResponse } from '../types';
 import { API_BASE_URL } from '../constants';
+import { mockSports, mockTeams, mockMedals, mockEvents, mockPlayers } from './mockData';
 
 class ApiService {
   private async fetchWithErrorHandling<T>(endpoint: string): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`);
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch ${endpoint}: ${response.statusText}`);
+    try {
+      const url = `${API_BASE_URL}${endpoint}`;
+      console.log(`Attempting to fetch: ${url}`);
+      
+      const response = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // Add timeout for production
+        signal: AbortSignal.timeout(10000), // 10 second timeout
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const result: ApiResponse<T> = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.error || `API Error: Failed to fetch ${endpoint}`);
+      }
+      
+      return result.data;
+    } catch (error) {
+      // Enhanced error logging for production debugging
+      console.error(`API Error for ${endpoint}:`, error);
+      
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error(`Network Error: Unable to connect to API at ${API_BASE_URL}. Please check your connection and try again.`);
+      }
+      
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error(`Request Timeout: API request to ${endpoint} timed out.`);
+      }
+      
+      throw error;
     }
-    
-    const result: ApiResponse<T> = await response.json();
-    
-    if (!result.success) {
-      throw new Error(result.error || `Failed to fetch ${endpoint}`);
+  }
+
+  // Fallback methods for when API is unavailable
+  private async withFallback<T>(
+    apiCall: () => Promise<T>,
+    fallbackData: T,
+    context: string
+  ): Promise<T> {
+    try {
+      return await apiCall();
+    } catch (error) {
+      console.warn(`${context}: API unavailable, using fallback data`, error);
+      
+      // Show a user-friendly notification that we're using demo data
+      if (process.env.NODE_ENV === 'production') {
+        console.info('📊 Using demo data - API is currently unavailable');
+      }
+      
+      return fallbackData;
     }
-    
-    return result.data;
   }
 
   // Sports API
   async getSports(): Promise<Sport[]> {
-    return this.fetchWithErrorHandling<Sport[]>('/sports');
+    return this.withFallback(
+      () => this.fetchWithErrorHandling<Sport[]>('/sports'),
+      mockSports,
+      'getSports'
+    );
   }
 
   async getSport(id: number): Promise<Sport> {
-    return this.fetchWithErrorHandling<Sport>(`/sports/${id}`);
+    return this.withFallback(
+      () => this.fetchWithErrorHandling<Sport>(`/sports/${id}`),
+      mockSports.find(s => s.ID === id) || mockSports[0],
+      'getSport'
+    );
   }
 
   async createSport(sportData: Omit<Sport, 'ID'>): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/sports`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(sportData),
-    });
+    try {
+      const response = await fetch(`${API_BASE_URL}/sports`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(sportData),
+        signal: AbortSignal.timeout(10000),
+      });
 
-    if (!response.ok) {
-      throw new Error(`Failed to create sport: ${response.statusText}`);
-    }
+      if (!response.ok) {
+        throw new Error(`Failed to create sport: ${response.statusText}`);
+      }
 
-    const result: ApiResponse<void> = await response.json();
-    if (!result.success) {
-      throw new Error(result.error || 'Failed to create sport');
+      const result: ApiResponse<void> = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to create sport');
+      }
+    } catch (error) {
+      console.error('Create sport error:', error);
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error(`Network Error: Unable to connect to API. Please check your connection.`);
+      }
+      throw error;
     }
   }
 
@@ -82,11 +144,19 @@ class ApiService {
 
   // Teams API
   async getTeams(): Promise<Team[]> {
-    return this.fetchWithErrorHandling<Team[]>('/teams');
+    return this.withFallback(
+      () => this.fetchWithErrorHandling<Team[]>('/teams'),
+      mockTeams,
+      'getTeams'
+    );
   }
 
   async getTeam(id: number): Promise<Team> {
-    return this.fetchWithErrorHandling<Team>(`/teams/${id}`);
+    return this.withFallback(
+      () => this.fetchWithErrorHandling<Team>(`/teams/${id}`),
+      mockTeams.find(t => t.ID === id) || mockTeams[0],
+      'getTeam'
+    );
   }
 
   async createTeam(teamData: Omit<Team, 'ID'>): Promise<void> {
@@ -144,11 +214,19 @@ class ApiService {
 
   // Players API
   async getPlayers(): Promise<Player[]> {
-    return this.fetchWithErrorHandling<Player[]>('/players');
+    return this.withFallback(
+      () => this.fetchWithErrorHandling<Player[]>('/players'),
+      mockPlayers,
+      'getPlayers'
+    );
   }
 
   async getPlayer(id: number): Promise<Player> {
-    return this.fetchWithErrorHandling<Player>(`/players/${id}`);
+    return this.withFallback(
+      () => this.fetchWithErrorHandling<Player>(`/players/${id}`),
+      mockPlayers.find(p => p.ID === id) || mockPlayers[0],
+      'getPlayer'
+    );
   }
 
   async createPlayer(playerData: Omit<Player, 'ID'>): Promise<void> {
@@ -206,11 +284,19 @@ class ApiService {
 
   // Medals API
   async getMedals(): Promise<Medal[]> {
-    return this.fetchWithErrorHandling<Medal[]>('/medals');
+    return this.withFallback(
+      () => this.fetchWithErrorHandling<Medal[]>('/medals'),
+      mockMedals,
+      'getMedals'
+    );
   }
 
   async getMedal(id: number): Promise<Medal> {
-    return this.fetchWithErrorHandling<Medal>(`/medals/${id}`);
+    return this.withFallback(
+      () => this.fetchWithErrorHandling<Medal>(`/medals/${id}`),
+      mockMedals.find(m => m.ID === id) || mockMedals[0],
+      'getMedal'
+    );
   }
 
   async createMedal(medalData: Omit<Medal, 'ID'>): Promise<void> {
@@ -268,11 +354,19 @@ class ApiService {
 
   // Schedules/Events API
   async getEvents(): Promise<Event[]> {
-    return this.fetchWithErrorHandling<Event[]>('/schedules');
+    return this.withFallback(
+      () => this.fetchWithErrorHandling<Event[]>('/schedules'),
+      mockEvents,
+      'getEvents'
+    );
   }
 
   async getEvent(id: number): Promise<Event> {
-    return this.fetchWithErrorHandling<Event>(`/schedules/${id}`);
+    return this.withFallback(
+      () => this.fetchWithErrorHandling<Event>(`/schedules/${id}`),
+      mockEvents.find(e => e.ID === id) || mockEvents[0],
+      'getEvent'
+    );
   }
 
   async createEvent(eventData: Omit<Event, 'ID'>): Promise<void> {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { QUERY_STALE_TIME, QUERY_GC_TIME } from './constants';
@@ -29,6 +29,11 @@ const queryClient = new QueryClient({
 });
 
 const App: React.FC = () => {
+  // Set document title on app load
+  useEffect(() => {
+    document.title = "PowerSchool Olympix";
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>

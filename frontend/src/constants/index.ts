@@ -1,5 +1,21 @@
-// API Configuration
-export const API_BASE_URL = 'http://localhost:3001/api/v1';
+// API Configuration - Environment aware
+const getApiBaseUrl = (): string => {
+  // Check if we're in development
+  if (process.env.NODE_ENV === 'development') {
+    return process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001/api/v1';
+  }
+  
+  // In production, try to use environment variable first
+  if (process.env.REACT_APP_API_BASE_URL) {
+    return process.env.REACT_APP_API_BASE_URL;
+  }
+  
+  // Fallback for production - construct API URL based on current domain
+  const currentDomain = window.location.origin;
+  return `${currentDomain}/api/v1`;
+};
+
+export const API_BASE_URL = getApiBaseUrl();
 
 // Query stale times (in milliseconds)
 export const QUERY_STALE_TIME = 1000 * 60 * 5; // 5 minutes

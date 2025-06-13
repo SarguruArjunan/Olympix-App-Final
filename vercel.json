@@ -7,6 +7,23 @@
   "framework": "create-react-app",
   "env": {
     "NODE_VERSION": "18.19.0",
-    "NPM_CONFIG_REGISTRY": "https://registry.npmjs.org/"
-  }
+    "NPM_CONFIG_REGISTRY": "https://registry.npmjs.org/",
+    "REACT_APP_API_BASE_URL": "@react_app_api_base_url"
+  },
+  "build": {
+    "env": {
+      "REACT_APP_API_BASE_URL": "@react_app_api_base_url"
+    }
+  },
+  "functions": {
+    "backend/src/server.ts": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/v1/(.*)",
+      "destination": "/api/server?path=$1"
+    }
+  ]
 }
