@@ -14,9 +14,11 @@ async function initializeData(): Promise<void> {
     const rootDataDir = join(__dirname, '../../../data');
     const sampleSportsPath = join(rootDataDir, 'sample-sports.json');
     const sampleTeamsPath = join(rootDataDir, 'sample-teams.json');
+    const sampleMedalsPath = join(rootDataDir, 'sample-medals.json');
     
     const sportsData = JSON.parse(await fs.readFile(sampleSportsPath, 'utf-8'));
     const teamsData = JSON.parse(await fs.readFile(sampleTeamsPath, 'utf-8'));
+    const medalsData = JSON.parse(await fs.readFile(sampleMedalsPath, 'utf-8'));
 
     // Read existing workbook
     const workbook = XLSX.readFile(join(DATA_DIR, 'EventData.xlsx'));
@@ -32,6 +34,10 @@ async function initializeData(): Promise<void> {
     // Update Events sheet with sample data
     const eventsWorksheet = XLSX.utils.json_to_sheet(sportsData.Events);
     workbook.Sheets['Events'] = eventsWorksheet;
+
+    // Update Medals sheet with sample data
+    const medalsWorksheet = XLSX.utils.json_to_sheet(medalsData.Medals);
+    workbook.Sheets['Medals'] = medalsWorksheet;
 
     // Write back to file
     XLSX.writeFile(workbook, join(DATA_DIR, 'EventData.xlsx'));

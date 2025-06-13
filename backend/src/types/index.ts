@@ -10,6 +10,9 @@ export interface Team {
   Name: string;
   Country: string;
   Logo_URL: string;
+  Organization: string;
+  TagLine: string;
+  Color: string;
 }
 
 export interface Player {
@@ -27,6 +30,13 @@ export interface Event {
   Date: string;
   Time: string;
   Location: string;
+  TeamA_ID?: number;
+  TeamB_ID?: number;
+  Status?: 'Scheduled' | 'In Progress' | 'Completed';
+  WinnerTeamID?: number;
+  TeamA_Score?: string;
+  TeamB_Score?: string;
+  ResultNotes?: string;
 }
 
 export interface Match {

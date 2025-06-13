@@ -5,36 +5,41 @@ import sportsRouter from './routes/sports';
 import schedulesRouter from './routes/schedules';
 import medalsRouter from './routes/medals';
 import teamsRouter from './routes/teams';
+import playersRouter from './routes/players';
 
 const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+// Increase payload size limit to handle base64 image uploads (10MB limit)
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-// Constants
-export const DATA_DIR = join(__dirname, '../../data');
+// Add request logging for debugging
+app.use((req, _res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  next();
+});
+
+// Data directory path
+export const DATA_DIR = join(__dirname, '../data');
 export const EXCEL_FILE = join(DATA_DIR, 'EventData.xlsx');
 
-// Routes
-app.use('/api/v1/sports', sportsRouter);
-app.use('/api/v1/schedules', schedulesRouter);
-app.use('/api/v1/medals', medalsRouter);
-app.use('/api/v1/teams', teamsRouter);
-
 // Health check endpoint
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok' });
-});
-
-// Error handling middleware
-app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({
-    success: false,
-    error: 'Internal Server Error',
-    message: process.env.NODE_ENV === 'development' ? err.message : undefined
+app.get('/', (_req, res) => {
+  res.json({ 
+    name: 'Olympix API', 
+    version: '1.0.0', 
+    environment: process.env.NODE_ENV || 'development',
+    timestamp: new Date().toISOString()
   });
 });
+
+// API routes
+app.use('/api/v1/sports', sportsRouter);
+app.use('/api/v1/teams', teamsRouter);
+app.use('/api/v1/schedules', schedulesRouter);
+app.use('/api/v1/medals', medalsRouter);
+app.use('/api/v1/players', playersRouter);
 
 export default app;

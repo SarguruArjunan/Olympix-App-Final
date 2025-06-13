@@ -25,6 +25,13 @@ async function startServer() {
     await ExcelService.initializeWorkbook();
     console.log('Excel workbook initialized successfully');
 
+    // Validate Excel file integrity
+    const isValid = await ExcelService.validateExcelFile();
+    if (!isValid) {
+      console.error('Excel file validation failed - data may be corrupted');
+      // Don't exit, but log the issue
+    }
+
     // Initialize sample data
     await initializeData();
     console.log('Sample data loaded successfully');
@@ -38,6 +45,23 @@ async function startServer() {
       console.log('- POST   /api/v1/sports');
       console.log('- PUT    /api/v1/sports/:id');
       console.log('- DELETE /api/v1/sports/:id');
+      console.log('- GET    /api/v1/teams');
+      console.log('- GET    /api/v1/teams/:id');
+      console.log('- POST   /api/v1/teams');
+      console.log('- PUT    /api/v1/teams/:id');
+      console.log('- DELETE /api/v1/teams/:id');
+      console.log('- GET    /api/v1/players');
+      console.log('- GET    /api/v1/players/:id');
+      console.log('- POST   /api/v1/players');
+      console.log('- PUT    /api/v1/players/:id');
+      console.log('- DELETE /api/v1/players/:id');
+      console.log('- GET    /api/v1/schedules');
+      console.log('- GET    /api/v1/schedules/:id');
+      console.log('- GET    /api/v1/schedules/sport/:sportId');
+      console.log('- GET    /api/v1/schedules/team/:teamId');
+      console.log('- POST   /api/v1/schedules');
+      console.log('- PUT    /api/v1/schedules/:id');
+      console.log('- DELETE /api/v1/schedules/:id');
       console.log('- GET    /api/v1/medals');
       console.log('- GET    /api/v1/medals/:id');
       console.log('- POST   /api/v1/medals');

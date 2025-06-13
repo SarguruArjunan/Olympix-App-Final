@@ -62,7 +62,8 @@
       "Name": "Foosball Tournament - Round 1",
       "Date": "2025-07-01",
       "Time": "10:00:00",
-      "Location": "Game Room A"
+      "Location": "Game Room A",
+      "Status": "Completed"
     },
     {
       "ID": 2,
@@ -70,7 +71,8 @@
       "Name": "Carrom Championship",
       "Date": "2025-07-01",
       "Time": "14:00:00",
-      "Location": "Indoor Arena"
+      "Location": "Indoor Arena",
+      "Status": "Completed"
     },
     {
       "ID": 3,
@@ -78,7 +80,8 @@
       "Name": "Chess Masters Series",
       "Date": "2025-07-02",
       "Time": "09:00:00",
-      "Location": "Strategy Hall"
+      "Location": "Strategy Hall",
+      "Status": "In Progress"
     },
     {
       "ID": 4,
@@ -86,7 +89,8 @@
       "Name": "Table Tennis Singles",
       "Date": "2025-07-02",
       "Time": "13:00:00",
-      "Location": "Sports Complex B"
+      "Location": "Sports Complex B",
+      "Status": "Scheduled"
     },
     {
       "ID": 5,
@@ -94,7 +98,8 @@
       "Name": "Badminton Mixed Doubles",
       "Date": "2025-07-03",
       "Time": "11:00:00",
-      "Location": "Court 1"
+      "Location": "Court 1",
+      "Status": "Scheduled"
     },
     {
       "ID": 6,
@@ -102,7 +107,8 @@
       "Name": "Cricket T20 Match",
       "Date": "2025-07-03",
       "Time": "15:00:00",
-      "Location": "Main Ground"
+      "Location": "Main Ground",
+      "Status": "Scheduled"
     }
   ]
 }
