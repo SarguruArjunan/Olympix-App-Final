@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { QUERY_STALE_TIME, QUERY_GC_TIME } from './constants';
 import { AuthProvider } from './contexts/AuthContext';
-import { ProtectedRoute } from './components';
+import { ProtectedRoute, ApiStatusIndicator } from './components';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import Sports from './pages/Sports';
@@ -23,7 +23,9 @@ const queryClient = new QueryClient({
       staleTime: QUERY_STALE_TIME,
       gcTime: QUERY_GC_TIME,
       refetchOnWindowFocus: false,
-      retry: 1,
+      retry: false, // Disable retry to let our fallback system handle failures immediately
+      refetchOnMount: false, // Prevent unnecessary refetches
+      refetchOnReconnect: false, // Let fallback data persist
     },
   },
 });
@@ -37,6 +39,7 @@ const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <ApiStatusIndicator />
         <BrowserRouter>
           <Routes>
             {/* Login route (outside of Layout) */}

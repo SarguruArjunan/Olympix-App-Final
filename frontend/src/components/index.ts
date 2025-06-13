@@ -1,3 +1,4 @@
+export { default as ApiStatusIndicator } from './ApiStatusIndicator';
 export { default as LoadingSpinner } from './LoadingSpinner';
 export { default as ErrorMessage } from './ErrorMessage';
 export { default as EmptyState } from './EmptyState';
@@ -5,4 +6,4 @@ export { default as Layout } from './Layout';
 export { default as SportCard } from './SportCard';
 export { default as ScheduleFilter } from './ScheduleFilter';
 export { default as IconImage } from './IconImage';
-export { default as ProtectedRoute } from './ProtectedRoute'; 
+export { default as ProtectedRoute } from './ProtectedRoute';

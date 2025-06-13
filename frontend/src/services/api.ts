@@ -8,13 +8,18 @@ class ApiService {
       const url = `${API_BASE_URL}${endpoint}`;
       console.log(`Attempting to fetch: ${url}`);
       
+      // Create timeout signal for better browser compatibility
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
       const response = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
         },
-        // Add timeout for production
-        signal: AbortSignal.timeout(10000), // 10 second timeout
+        signal: controller.signal,
       });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -82,14 +87,19 @@ class ApiService {
 
   async createSport(sportData: Omit<Sport, 'ID'>): Promise<void> {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      
       const response = await fetch(`${API_BASE_URL}/sports`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(sportData),
-        signal: AbortSignal.timeout(10000),
+        signal: controller.signal,
       });
+      
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error(`Failed to create sport: ${response.statusText}`);
