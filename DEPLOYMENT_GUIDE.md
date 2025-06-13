@@ -85,10 +85,11 @@ The issue was caused by version incompatibilities between:
 
 #### vercel.json
 
-- Uses `@vercel/static-build` for React apps
-- Specifies Node.js 18.x runtime
-- Sets proper build and install commands
+- Uses simplified configuration for React apps
+- Specifies Node.js 18.19.0 environment
+- Sets proper build, install, and output commands
 - Configures environment variables
+- Removes conflicting `builds` and `functions` properties
 
 #### package.json engines
 

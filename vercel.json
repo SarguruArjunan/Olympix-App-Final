@@ -1,31 +1,10 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "frontend/build",
-        "installCommand": "npm ci",
-        "buildCommand": "npm run build"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/backend/dist/app.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/build/index.html"
-    }
-  ],
-  "functions": {
-    "backend/dist/app.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
+  "buildCommand": "cd frontend && npm ci && npm run build",
+  "outputDirectory": "frontend/build",
+  "installCommand": "cd frontend && npm ci",
+  "devCommand": "cd frontend && npm start",
+  "framework": "create-react-app",
   "env": {
     "NODE_VERSION": "18.19.0",
     "NPM_CONFIG_REGISTRY": "https://registry.npmjs.org/"
