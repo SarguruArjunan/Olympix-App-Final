@@ -110,8 +110,41 @@ The build now works successfully both locally and should work in production with
 - Consistent Node.js 18.19.0 environment
 - Proper Vercel configuration
 
+## Additional Production Issue: Sports Icons Not Displaying
+
+### Problem
+
+Sports icons appear correctly in local development but fail to load in production deployment.
+
+### Root Cause
+
+**Case sensitivity mismatch**:
+
+- Data URLs used `/icons/` (lowercase)
+- Actual folder structure: `/Icons/` (uppercase I)
+- Works on macOS (case-insensitive) but fails on Linux production servers (case-sensitive)
+
+### Solution Applied
+
+#### 1. Fixed Data Source
+
+- Updated [`data/sample-sports.json`](data/sample-sports.json:1) to use correct case `/Icons/`
+- Reinitialized backend Excel data with corrected paths
+
+#### 2. Enhanced IconImage Component
+
+- Added intelligent fallback logic in [`frontend/src/components/IconImage.tsx`](frontend/src/components/IconImage.tsx:1)
+- Automatically tries alternative case if first attempt fails
+- Provides graceful fallback to default icon if both cases fail
+
+#### 3. Production Compatibility
+
+- Icons now work consistently across all environments
+- Handles both case-sensitive and case-insensitive file systems
+
 ### Future Considerations
 
 - Monitor React 19 compatibility with react-scripts
 - Consider upgrading to newer build tools (Vite, etc.) for React 19 support
 - Regular dependency updates with compatibility testing
+- Always use consistent case for asset paths in cross-platform deployments

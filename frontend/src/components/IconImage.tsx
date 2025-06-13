@@ -1,4 +1,4 @@
-import React, { useRef, memo } from 'react';
+import React, { useRef, memo, useState } from 'react';
 
 const DEFAULT_ICON = `data:image/svg+xml,${encodeURIComponent(`
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -16,11 +16,30 @@ interface IconImageProps {
 
 const IconImage = memo(({ src, alt, className }: IconImageProps) => {
   const imgRef = useRef<HTMLImageElement>(null);
-  const hasErrorRef = useRef(false);
+  const [currentSrc, setCurrentSrc] = useState(src);
+  const hasTriedFallbackRef = useRef(false);
   
   const handleImageError = () => {
-    if (!hasErrorRef.current && imgRef.current) {
-      hasErrorRef.current = true;
+    if (imgRef.current) {
+      // First try: if URL contains '/icons/', try '/Icons/' (case fix)
+      if (currentSrc.includes('/icons/') && !hasTriedFallbackRef.current) {
+        hasTriedFallbackRef.current = true;
+        const fallbackSrc = currentSrc.replace('/icons/', '/Icons/');
+        setCurrentSrc(fallbackSrc);
+        imgRef.current.src = fallbackSrc;
+        return;
+      }
+      
+      // Second try: if URL contains '/Icons/', try '/icons/' (reverse case)
+      if (currentSrc.includes('/Icons/') && !hasTriedFallbackRef.current) {
+        hasTriedFallbackRef.current = true;
+        const fallbackSrc = currentSrc.replace('/Icons/', '/icons/');
+        setCurrentSrc(fallbackSrc);
+        imgRef.current.src = fallbackSrc;
+        return;
+      }
+      
+      // Final fallback: use default icon
       imgRef.current.src = DEFAULT_ICON;
     }
   };
@@ -28,7 +47,7 @@ const IconImage = memo(({ src, alt, className }: IconImageProps) => {
   return (
     <img
       ref={imgRef}
-      src={src}
+      src={currentSrc}
       alt={alt}
       className={className}
       onError={handleImageError}
