@@ -6,7 +6,8 @@
   "devCommand": "cd frontend && npm start",
   "framework": "create-react-app",
   "env": {
-    "NPM_CONFIG_REGISTRY": "https://registry.npmjs.org/"
+    "NPM_CONFIG_REGISTRY": "https://registry.npmjs.org/",
+    "NODE_VERSION": "18.19.0"
   },
   "build": {
     "env": {

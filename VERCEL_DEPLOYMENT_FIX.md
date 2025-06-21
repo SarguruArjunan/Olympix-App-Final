@@ -72,21 +72,28 @@ git push origin main
 
 ### If Build Still Fails:
 
-1. **Check Vercel Function Logs**:
+1. **Fix Node.js Version in Vercel Dashboard** (CRITICAL):
+
+   - Go to Vercel Dashboard → Your Project → Settings → General
+   - Scroll to "Node.js Version"
+   - Change from "22.x" to "18.x"
+   - Save settings and redeploy
+
+2. **Check Vercel Function Logs**:
 
    - Go to Vercel Dashboard → Your Project → Functions tab
    - Look for errors in the build logs
 
-2. **Verify Node Version**:
+3. **Verify Node Version Configuration**:
 
    - Ensure all `.nvmrc` files specify `18.19.0`
-   - Check Vercel dashboard settings
+   - `NODE_VERSION` environment variable is set to `18.19.0`
 
-3. **Clear Build Cache**:
+4. **Clear Build Cache**:
 
    - In Vercel dashboard: Settings → Build & Development → Clear Cache
 
-4. **Environment Variables**:
+5. **Environment Variables**:
    - Ensure no conflicting env vars in Vercel dashboard
    - Remove any `REACT_APP_API_BASE_URL` if manually set
 
