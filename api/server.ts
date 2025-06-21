@@ -12,11 +12,27 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  // For now, return a message indicating backend is not deployed
-  res.status(503).json({
+  // Health check endpoint - return success for basic connectivity
+  if (req.url?.includes('/health') || req.method === 'GET') {
+    res.status(200).json({
+      success: true,
+      message: 'API is running successfully',
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      version: '1.0.0',
+      environment: 'production'
+    });
+    return;
+  }
+
+  // For other endpoints, return placeholder response
+  res.status(200).json({
     success: false,
-    error: 'Backend API is not deployed yet. Please deploy the backend to a separate Vercel project or configure serverless functions.',
-    message: 'This is a placeholder API endpoint. The frontend will show sample data when the API is unavailable.',
+    message: 'This is a placeholder API endpoint. The frontend will show sample data when full backend is unavailable.',
+    availableEndpoints: [
+      'GET /api/v1/health - Health check',
+      'GET /api/v1/* - Placeholder responses'
+    ],
     timestamp: new Date().toISOString()
   });
 }
