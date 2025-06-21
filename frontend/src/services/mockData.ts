@@ -19,6 +19,36 @@ export const mockSports: Sport[] = [
     Name: "Chess",
     Description: "Strategic board game",
     Icon_URL: "/Icons/chess.svg"
+  },
+  {
+    ID: 4,
+    Name: "Badminton",
+    Description: "Racquet sport with shuttlecock",
+    Icon_URL: "/Icons/badminton.svg"
+  },
+  {
+    ID: 5,
+    Name: "Table Tennis",
+    Description: "Indoor racquet sport",
+    Icon_URL: "/Icons/table-tennis.svg"
+  },
+  {
+    ID: 6,
+    Name: "Football",
+    Description: "Most popular sport worldwide",
+    Icon_URL: "/Icons/football.svg"
+  },
+  {
+    ID: 7,
+    Name: "Carrom",
+    Description: "Traditional board game",
+    Icon_URL: "/Icons/carrom.svg"
+  },
+  {
+    ID: 8,
+    Name: "Foosball",
+    Description: "Table football game",
+    Icon_URL: "/Icons/foosball.svg"
   }
 ];
 
@@ -40,6 +70,42 @@ export const mockTeams: Team[] = [
     Organization: "PowerSchool",
     TagLine: "Strike Like Lightning",
     Color: "#4ECDC4"
+  },
+  {
+    ID: 3,
+    Name: "Fire Hawks",
+    Country: "India",
+    Logo_URL: "/images/teams/fire-hawks.png",
+    Organization: "PowerSchool",
+    TagLine: "Soaring to Victory",
+    Color: "#FF9F43"
+  },
+  {
+    ID: 4,
+    Name: "Ocean Warriors",
+    Country: "India",
+    Logo_URL: "/images/teams/ocean-warriors.png",
+    Organization: "PowerSchool",
+    TagLine: "Riding the Waves",
+    Color: "#3742FA"
+  },
+  {
+    ID: 5,
+    Name: "Green Guardians",
+    Country: "India",
+    Logo_URL: "/images/teams/green-guardians.png",
+    Organization: "PowerSchool",
+    TagLine: "Protecting Our Future",
+    Color: "#2ED573"
+  },
+  {
+    ID: 6,
+    Name: "Golden Eagles",
+    Country: "India",
+    Logo_URL: "/images/teams/golden-eagles.png",
+    Organization: "PowerSchool",
+    TagLine: "Flying High",
+    Color: "#FFA726"
   }
 ];
 

@@ -16,7 +16,7 @@ const Login: React.FC = () => {
   const [error, setError] = useState<string>('');
 
   // Get the intended destination from state or default to /admin
-  const from = location.state?.from?.pathname || '/admin';
+  const from = (location.state as any)?.from?.pathname || '/admin';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
