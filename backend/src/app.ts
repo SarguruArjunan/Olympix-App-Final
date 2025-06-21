@@ -9,8 +9,14 @@ import playersRouter from './routes/players';
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// Middleware - Configure CORS for production
+app.use(cors({
+  origin: [
+    'https://olympix-app-final.vercel.app',
+    'http://localhost:3000', // for development
+  ],
+  credentials: true
+}));
 // Increase payload size limit to handle base64 image uploads (10MB limit)
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
