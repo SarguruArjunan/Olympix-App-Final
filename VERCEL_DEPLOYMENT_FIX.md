@@ -7,7 +7,7 @@
 - ❌ **Problem**: Mixed project-level and function configurations
 - ✅ **Fixed**: Proper structure with correct function mapping
 - ✅ **Fixed**: Removed environment variable references (`@react_app_api_base_url`)
-- ✅ **Fixed**: Used `nodeVersion` instead of `NODE_VERSION` in env
+- ✅ **Fixed**: Removed invalid `nodeVersion` property (Node.js version controlled by `.nvmrc` files)
 
 ### 2. **Missing TypeScript Dependencies**
 
