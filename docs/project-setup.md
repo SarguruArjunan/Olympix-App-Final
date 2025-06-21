@@ -68,8 +68,7 @@ npm install
 cp .env.example .env
 
 # Configure environment variables
-VITE_API_URL="http://localhost:3000/api/v1"
-VITE_WS_URL="ws://localhost:3000"
+REACT_APP_API_BASE_URL="http://localhost:3001/api/v1"
 
 # Start development server
 npm run dev
@@ -164,12 +163,10 @@ PORT=3000
 DATABASE_URL=postgresql://user:password@localhost:5432/ps_olympics
 REDIS_URL=redis://localhost:6379
 JWT_SECRET=your-secret-key
-CORS_ORIGIN=http://localhost:5173
+CORS_ORIGIN=http://localhost:3000
 
 # Frontend (.env)
-VITE_API_URL=http://localhost:3000/api/v1
-VITE_WS_URL=ws://localhost:3000
-VITE_GA_TRACKING_ID=UA-XXXXXXXXX-X
+REACT_APP_API_BASE_URL=http://localhost:3001/api/v1
 ```
 
 ### 2. Production Environment

@@ -6,6 +6,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import EmptyState from '../components/EmptyState';
 import IconImage from '../components/IconImage';
+import BackButton from '../components/BackButton';
 import { formatDate, formatTime } from '../utils/helpers';
 import { getTeamInitials } from '../utils/helpers';
 import { Event } from '../types';
@@ -104,6 +105,8 @@ const SportDetail: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4">
+      <BackButton to="/sports" label="Back to Sports" />
+      
       <div className="flex items-center gap-6 mb-8">
         <IconImage
           src={sport.Icon_URL}

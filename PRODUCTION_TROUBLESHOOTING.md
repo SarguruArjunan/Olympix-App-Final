@@ -41,7 +41,7 @@ Your app now uses this priority order for API URLs:
 
 1. **Development**: `http://localhost:3001/api/v1`
 2. **Production with env var**: `REACT_APP_API_BASE_URL` value
-3. **Production fallback**: `https://your-domain.vercel.app/api/v1`
+3. **Production fallback**: `https://olympix-app-final.vercel.app/api/v1`
 
 ### Step 2: Test API Endpoints Manually
 
@@ -49,13 +49,13 @@ Try these URLs in your browser:
 
 ```bash
 # Test the health endpoint
-https://your-production-domain.vercel.app/api/v1/health
+https://olympix-app-final.vercel.app/api/v1/health
 
 # Test teams endpoint
-https://your-production-domain.vercel.app/api/v1/teams
+https://olympix-app-final.vercel.app/api/v1/teams
 
 # Test sports endpoint
-https://your-production-domain.vercel.app/api/v1/sports
+https://olympix-app-final.vercel.app/api/v1/sports
 ```
 
 **Expected Results:**
@@ -110,7 +110,7 @@ https://your-production-domain.vercel.app/api/v1/sports
 app.use(
   cors({
     origin: [
-      "https://your-frontend-domain.vercel.app",
+      "https://olympix-app-final.vercel.app",
       "http://localhost:3000", // for development
     ],
   })
