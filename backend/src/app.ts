@@ -41,6 +41,17 @@ app.get('/', (_req, res) => {
   });
 });
 
+// Health check endpoint for frontend status monitoring
+app.get('/api/v1/health', (_req, res) => {
+  res.json({
+    name: 'Olympix API',
+    version: '1.0.0',
+    status: 'healthy',
+    environment: process.env.NODE_ENV || 'development',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // API routes
 app.use('/api/v1/sports', sportsRouter);
 app.use('/api/v1/teams', teamsRouter);

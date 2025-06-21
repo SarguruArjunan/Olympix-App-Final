@@ -1,5 +1,7 @@
+import { VercelRequest, VercelResponse } from '@vercel/node';
+
 // Simple health check API for production
-export default function handler(req: any, res: any) {
+export default function handler(req: VercelRequest, res: VercelResponse) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');

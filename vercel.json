@@ -1,22 +1,21 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm ci && npm run build",
+  "buildCommand": "npm install && cd frontend && npm ci && npm run build",
   "outputDirectory": "frontend/build",
-  "installCommand": "cd frontend && npm ci",
+  "installCommand": "npm install && cd frontend && npm ci",
   "devCommand": "cd frontend && npm start",
   "framework": "create-react-app",
+  "nodeVersion": "18.19.0",
   "env": {
-    "NODE_VERSION": "18.19.0",
-    "NPM_CONFIG_REGISTRY": "https://registry.npmjs.org/",
-    "REACT_APP_API_BASE_URL": "@react_app_api_base_url"
+    "NPM_CONFIG_REGISTRY": "https://registry.npmjs.org/"
   },
   "build": {
     "env": {
-      "REACT_APP_API_BASE_URL": "@react_app_api_base_url"
+      "REACT_APP_API_BASE_URL": "https://olympix-app-final.vercel.app/api/v1"
     }
   },
   "functions": {
-    "backend/src/server.ts": {
+    "api/server.ts": {
       "runtime": "nodejs18.x"
     }
   },

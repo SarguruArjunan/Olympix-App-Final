@@ -19,9 +19,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^5.0.1",
+    "@vercel/node": "^3.0.0"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "@types/node": "^18.19.111"
   }
 }
