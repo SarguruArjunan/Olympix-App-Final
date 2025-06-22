@@ -1,45 +1,89 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
+import { promises as fs } from 'fs';
+import { join } from 'path';
 
-// Real data from Excel/JSON files
-const realData = {
-  sports: [
-    { ID: 1, Name: "Foosball", Description: "Table football game", Icon_URL: "/Icons/foosball.svg" },
-    { ID: 2, Name: "Carrom", Description: "Traditional board game", Icon_URL: "/Icons/carrom.svg" },
-    { ID: 3, Name: "Chess", Description: "Strategic board game", Icon_URL: "/Icons/chess.svg" },
-    { ID: 4, Name: "Table Tennis", Description: "Indoor racquet sport", Icon_URL: "/Icons/table-tennis.svg" },
-    { ID: 5, Name: "Badminton", Description: "Racquet sport with shuttlecock", Icon_URL: "/Icons/badminton.svg" },
-    { ID: 6, Name: "Cricket", Description: "Popular bat-and-ball game", Icon_URL: "/Icons/cricket.svg" },
-    { ID: 7, Name: "Football", Description: "Most popular sport worldwide", Icon_URL: "/Icons/football.svg" },
-    { ID: 8, Name: "Basketball", Description: "Fast-paced team sport", Icon_URL: "/Icons/basketball.svg" },
-    { ID: 9, Name: "Lemon Spoon Race", Description: "Fun balancing race", Icon_URL: "/Icons/lemon-spoon.svg" }
-  ],
-  teams: [
-    { ID: 1, Name: "Success Squad", Country: "USA", Logo_URL: "/images/teams/success-squad.png", Organization: "Enablement & Success", TagLine: "Game On,CustGrSnss", Color: "#000000" },
-    { ID: 2, Name: "BkNdBoss", Country: "India", Logo_URL: "/images/teams/bkndboss.png", Organization: "G&A", TagLine: "Game On,BkNd Strong!", Color: "#8B4513" },
-    { ID: 3, Name: "Olympus", Country: "USA", Logo_URL: "/images/teams/olympus.png", Organization: "Hosting & Security", TagLine: "Power of Gods", Color: "#800080" },
-    { ID: 4, Name: "ClassIX", Country: "Canada", Logo_URL: "/images/teams/classix.png", Organization: "Classroom", TagLine: "Raw Skill, Pure Class", Color: "#FF8C00" },
-    { ID: 5, Name: "KRR", Country: "UK", Logo_URL: "/images/teams/krr.png", Organization: "Compliance", TagLine: "Rise Rally Reign", Color: "#808080" },
-    { ID: 6, Name: "CoreForce", Country: "Australia", Logo_URL: "/images/teams/coreforce.png", Organization: "PS SIS+", TagLine: "Unleash Our Core Power", Color: "#FF0000" },
-    { ID: 7, Name: "PhoenIX", Country: "India", Logo_URL: "/images/teams/phoenix.png", Organization: "UI&DS", TagLine: "Honor, Fire, Victory", Color: "#008000" },
-    { ID: 8, Name: "NUM1", Country: "USA", Logo_URL: "/images/teams/num1.png", Organization: "UT&CCLR", TagLine: "United for Success", Color: "#00CED1" },
-    { ID: 9, Name: "ERP Blaze", Country: "Germany", Logo_URL: "/images/teams/erp-blaze.png", Organization: "ERP & HED R&D", TagLine: "Elevate Radiate Power", Color: "#000080" },
-    { ID: 10, Name: "On Point", Country: "India", Logo_URL: "/images/teams/on-point.png", Organization: "Services", TagLine: "Swift Sharp Strong", Color: "#FFFF00" },
-    { ID: 11, Name: "Warriors", Country: "USA", Logo_URL: "/images/teams/warriors.png", Organization: "Support 1", TagLine: "Built to Battle", Color: "#FF69B4" },
-    { ID: 12, Name: "Knights", Country: "Canada", Logo_URL: "/images/teams/knights.png", Organization: "Support 2", TagLine: "Lead with Power", Color: "#008B8B" }
-  ],
-  medals: [],
-  players: [],
+// In-memory storage for dynamic data (events created during session)
+let dynamicData = {
   schedules: []
 };
 
-// Use real data instead of mock data
-const mockData = realData;
+// Function to load data from JSON files
+async function loadDataFromFiles() {
+  try {
+    const dataDir = join(process.cwd(), 'data');
+    
+    // Read all JSON files
+    const teamsData = await fs.readFile(join(dataDir, 'sample-teams.json'), 'utf-8');
+    const medalsData = await fs.readFile(join(dataDir, 'sample-medals.json'), 'utf-8');
+    const sportsData = await fs.readFile(join(dataDir, 'sample-sports.json'), 'utf-8');
+    
+    const teams = JSON.parse(teamsData).Teams;
+    const medals = JSON.parse(medalsData).Medals;
+    const sports = JSON.parse(sportsData).Sports;
+    
+    return {
+      sports,
+      teams,
+      medals,
+      players: [], // Will need to add players.json if needed
+      schedules: dynamicData.schedules // Use in-memory data for events
+    };
+  } catch (error) {
+    console.error('Error loading data from files:', error);
+    // Fallback to static data if file reading fails
+    return getStaticData();
+  }
+}
+
+// Fallback static data
+function getStaticData() {
+  return {
+    sports: [
+      { ID: 1, Name: "Foosball", Description: "Table football game", Icon_URL: "/Icons/foosball.svg" },
+      { ID: 2, Name: "Carrom", Description: "Traditional board game", Icon_URL: "/Icons/carrom.svg" },
+      { ID: 3, Name: "Chess", Description: "Strategic board game", Icon_URL: "/Icons/chess.svg" },
+      { ID: 4, Name: "Table Tennis", Description: "Indoor racquet sport", Icon_URL: "/Icons/table-tennis.svg" },
+      { ID: 5, Name: "Badminton", Description: "Racquet sport with shuttlecock", Icon_URL: "/Icons/badminton.svg" },
+      { ID: 6, Name: "Cricket", Description: "Popular bat-and-ball game", Icon_URL: "/Icons/cricket.svg" },
+      { ID: 7, Name: "Football", Description: "Most popular sport worldwide", Icon_URL: "/Icons/football.svg" },
+      { ID: 8, Name: "Basketball", Description: "Fast-paced team sport", Icon_URL: "/Icons/basketball.svg" },
+      { ID: 9, Name: "Lemon Spoon Race", Description: "Fun balancing race", Icon_URL: "/Icons/lemon-spoon.svg" }
+    ],
+    teams: [
+      { ID: 1, Name: "Success Squad", Country: "USA", Logo_URL: "/images/teams/success-squad.png", Organization: "Enablement & Success", TagLine: "Game On,CustGrSnss", Color: "#000000" },
+      { ID: 2, Name: "BkNdBoss", Country: "India", Logo_URL: "/images/teams/bkndboss.png", Organization: "G&A", TagLine: "Game On,BkNd Strong!", Color: "#8B4513" },
+      { ID: 3, Name: "Olympus", Country: "USA", Logo_URL: "/images/teams/olympus.png", Organization: "Hosting & Security", TagLine: "Power of Gods", Color: "#800080" },
+      { ID: 4, Name: "ClassIX", Country: "Canada", Logo_URL: "/images/teams/classix.png", Organization: "Classroom", TagLine: "Raw Skill, Pure Class", Color: "#FF8C00" },
+      { ID: 5, Name: "KRR", Country: "UK", Logo_URL: "/images/teams/krr.png", Organization: "Compliance", TagLine: "Rise Rally Reign", Color: "#808080" },
+      { ID: 6, Name: "CoreForce", Country: "Australia", Logo_URL: "/images/teams/coreforce.png", Organization: "PS SIS+", TagLine: "Unleash Our Core Power", Color: "#FF0000" },
+      { ID: 7, Name: "PhoenIX", Country: "India", Logo_URL: "/images/teams/phoenix.png", Organization: "UI&DS", TagLine: "Honor, Fire, Victory", Color: "#008000" },
+      { ID: 8, Name: "NUM1", Country: "USA", Logo_URL: "/images/teams/num1.png", Organization: "UT&CCLR", TagLine: "United for Success", Color: "#00CED1" },
+      { ID: 9, Name: "ERP Blaze", Country: "Germany", Logo_URL: "/images/teams/erp-blaze.png", Organization: "ERP & HED R&D", TagLine: "Elevate Radiate Power", Color: "#000080" },
+      { ID: 10, Name: "On Point", Country: "India", Logo_URL: "/images/teams/on-point.png", Organization: "Services", TagLine: "Swift Sharp Strong", Color: "#FFFF00" },
+      { ID: 11, Name: "Warriors", Country: "USA", Logo_URL: "/images/teams/warriors.png", Organization: "Support 1", TagLine: "Built to Battle", Color: "#FF69B4" },
+      { ID: 12, Name: "Knights", Country: "Canada", Logo_URL: "/images/teams/knights.png", Organization: "Support 2", TagLine: "Lead with Power", Color: "#008B8B" }
+    ],
+    medals: [
+      { ID: 1, TeamID: 1, SportID: 1, Gold: 2, Silver: 1, Bronze: 0, Total: 3 },
+      { ID: 2, TeamID: 1, SportID: 3, Gold: 1, Silver: 0, Bronze: 1, Total: 2 },
+      { ID: 3, TeamID: 1, SportID: 4, Gold: 0, Silver: 2, Bronze: 1, Total: 3 },
+      { ID: 4, TeamID: 2, SportID: 2, Gold: 1, Silver: 1, Bronze: 1, Total: 3 },
+      { ID: 5, TeamID: 2, SportID: 5, Gold: 2, Silver: 0, Bronze: 0, Total: 2 },
+      { ID: 6, TeamID: 2, SportID: 7, Gold: 1, Silver: 1, Bronze: 0, Total: 2 },
+      { ID: 7, TeamID: 3, SportID: 6, Gold: 0, Silver: 1, Bronze: 2, Total: 3 },
+      { ID: 8, TeamID: 3, SportID: 8, Gold: 1, Silver: 0, Bronze: 1, Total: 2 },
+      { ID: 9, TeamID: 3, SportID: 9, Gold: 0, Silver: 1, Bronze: 0, Total: 1 }
+    ],
+    players: [],
+    schedules: dynamicData.schedules
+  };
+}
 
 // Helper functions for CRUD operations
 let nextId = {
   sports: 10, // Next ID after the 9 existing sports
   teams: 13,  // Next ID after the 12 existing teams
-  medals: 1,
+  medals: 10, // Next ID after the 9 existing medals
   players: 1,
   schedules: 1
 };
@@ -57,7 +101,7 @@ function findItemIndex(collection: any[], id: number) {
 }
 
 // Production API with proper routing
-export default function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   // DEBUGGING: Log all incoming requests
   console.log('=== API REQUEST DEBUG ===');
   console.log('Method:', req.method);
@@ -85,6 +129,9 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
   console.log('Request method:', req.method);
 
   try {
+    // Load data from files
+    const mockData = await loadDataFromFiles();
+    
     // Route handling
     if (pathStr === 'health' || pathStr === '') {
       res.status(200).json({
@@ -150,6 +197,7 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
 
     if (pathStr === 'medals') {
       if (req.method === 'GET') {
+        console.log('Returning medals data:', mockData.medals.length, 'medals');
         res.status(200).json({
           success: true,
           data: mockData.medals
@@ -202,7 +250,7 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
       if (req.method === 'GET') {
         res.status(200).json({
           success: true,
-          data: mockData.schedules
+          data: dynamicData.schedules
         });
         return;
       }
@@ -213,7 +261,7 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
           ID: generateId('schedules'),
           ...req.body
         };
-        mockData.schedules.push(newEvent);
+        dynamicData.schedules.push(newEvent);
         console.log('Event created successfully:', newEvent);
         res.status(201).json({
           success: true,
@@ -392,7 +440,7 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
       const id = parseInt(pathStr.split('/')[1]);
       
       if (req.method === 'GET') {
-        const schedule = findItemById(mockData.schedules, id);
+        const schedule = findItemById(dynamicData.schedules, id);
         if (schedule) {
           res.status(200).json({
             success: true,
@@ -404,13 +452,13 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
       
       if (req.method === 'PUT') {
         console.log(`Updating schedule ${id}:`, req.body);
-        const index = findItemIndex(mockData.schedules, id);
+        const index = findItemIndex(dynamicData.schedules, id);
         if (index !== -1) {
-          mockData.schedules[index] = { ...mockData.schedules[index], ...req.body };
-          console.log('Schedule updated successfully:', mockData.schedules[index]);
+          dynamicData.schedules[index] = { ...dynamicData.schedules[index], ...req.body };
+          console.log('Schedule updated successfully:', dynamicData.schedules[index]);
           res.status(200).json({
             success: true,
-            data: mockData.schedules[index],
+            data: dynamicData.schedules[index],
             message: 'Schedule updated successfully'
           });
           return;
@@ -419,9 +467,9 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
       
       if (req.method === 'DELETE') {
         console.log(`Deleting schedule ${id}`);
-        const index = findItemIndex(mockData.schedules, id);
+        const index = findItemIndex(dynamicData.schedules, id);
         if (index !== -1) {
-          const deleted = mockData.schedules.splice(index, 1)[0];
+          const deleted = dynamicData.schedules.splice(index, 1)[0];
           console.log('Schedule deleted successfully:', deleted);
           res.status(200).json({
             success: true,
