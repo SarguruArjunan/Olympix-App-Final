@@ -1,0 +1,92 @@
+[build]
+  command = "cd frontend && npm run build"
+  publish = "frontend/build"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# API redirects - map /api/v1/* to Netlify Functions
+# Handle specific schedule endpoints first (more specific routes first)
+[[redirects]]
+  from = "/api/v1/schedules/sport/*"
+  to = "/.netlify/functions/schedules-sport/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/api/v1/schedules/team/*"
+  to = "/.netlify/functions/schedules-team/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/api/v1/schedules/*"
+  to = "/.netlify/functions/events/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/api/v1/schedules"
+  to = "/.netlify/functions/events"
+  status = 200
+
+[[redirects]]
+  from = "/api/v1/teams/*"
+  to = "/.netlify/functions/teams/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/api/v1/teams"
+  to = "/.netlify/functions/teams"
+  status = 200
+
+[[redirects]]
+  from = "/api/v1/players/*"
+  to = "/.netlify/functions/players/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/api/v1/players"
+  to = "/.netlify/functions/players"
+  status = 200
+
+[[redirects]]
+  from = "/api/v1/sports/*"
+  to = "/.netlify/functions/sports/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/api/v1/sports"
+  to = "/.netlify/functions/sports"
+  status = 200
+
+[[redirects]]
+  from = "/api/v1/medals/*"
+  to = "/.netlify/functions/medals/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/api/v1/medals"
+  to = "/.netlify/functions/medals"
+  status = 200
+
+# Handle React Router - catch all routes
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# CORS headers for API functions
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
