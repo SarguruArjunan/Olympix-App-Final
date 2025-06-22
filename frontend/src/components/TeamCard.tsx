@@ -40,15 +40,32 @@ const TeamCard: React.FC<TeamCardProps> = memo(({
                     className="w-full h-full object-cover rounded-full"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
+                      // Show initials when logo fails to load
+                      const initialsSpan = e.currentTarget.nextElementSibling as HTMLElement;
+                      if (initialsSpan) {
+                        initialsSpan.style.display = 'block';
+                      }
                     }}
                     onLoad={(e) => {
                       e.currentTarget.style.display = 'block';
+                      // Hide initials when logo loads successfully
+                      const initialsSpan = e.currentTarget.nextElementSibling as HTMLElement;
+                      if (initialsSpan) {
+                        initialsSpan.style.display = 'none';
+                      }
                     }}
                   />
                 ) : null}
-                <span className={logoUrl ? 'absolute' : ''}>
-                  {getTeamInitials(name)}
-                </span>
+                {!logoUrl && (
+                  <span>
+                    {getTeamInitials(name)}
+                  </span>
+                )}
+                {logoUrl && (
+                  <span style={{ display: 'none' }}>
+                    {getTeamInitials(name)}
+                  </span>
+                )}
               </div>
             </div>
           </div>

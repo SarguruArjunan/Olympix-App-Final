@@ -92,15 +92,32 @@ const TeamDetail: React.FC = () => {
                   className="w-full h-full object-cover rounded-full"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
+                    // Show initials when logo fails to load
+                    const initialsSpan = e.currentTarget.nextElementSibling as HTMLElement;
+                    if (initialsSpan) {
+                      initialsSpan.style.display = 'block';
+                    }
                   }}
                   onLoad={(e) => {
                     e.currentTarget.style.display = 'block';
+                    // Hide initials when logo loads successfully
+                    const initialsSpan = e.currentTarget.nextElementSibling as HTMLElement;
+                    if (initialsSpan) {
+                      initialsSpan.style.display = 'none';
+                    }
                   }}
                 />
               ) : null}
-              <span className={team.Logo_URL ? 'absolute' : ''}>
-                {getTeamInitials(team.Name)}
-              </span>
+              {!team.Logo_URL && (
+                <span>
+                  {getTeamInitials(team.Name)}
+                </span>
+              )}
+              {team.Logo_URL && (
+                <span style={{ display: 'none' }}>
+                  {getTeamInitials(team.Name)}
+                </span>
+              )}
             </div>
           </div>
           <div className="flex-1">

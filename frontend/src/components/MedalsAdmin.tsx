@@ -101,7 +101,7 @@ const MedalsAdmin: React.FC = () => {
     // Scroll to top smoothly and focus on first field
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => {
-      const firstInput = document.getElementById('team');
+      const firstInput = document.getElementById('sport');
       if (firstInput) {
         firstInput.focus();
       }
@@ -304,7 +304,7 @@ const MedalsAdmin: React.FC = () => {
               // Scroll to top smoothly and focus on first field when opening form
               window.scrollTo({ top: 0, behavior: 'smooth' });
               setTimeout(() => {
-                const firstInput = document.getElementById('team');
+                const firstInput = document.getElementById('sport');
                 if (firstInput) {
                   firstInput.focus();
                 }
@@ -325,28 +325,8 @@ const MedalsAdmin: React.FC = () => {
           </h3>
           
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Team and Sport Selection */}
+            {/* Sport and Team Selection - Sport first, then Team */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="team" className="block text-sm font-medium text-gray-700 mb-1">
-                  Team *
-                </label>
-                <select
-                  id="team"
-                  value={formData.TeamID}
-                  onChange={(e) => setFormData({ ...formData, TeamID: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                  required
-                >
-                  <option value="">Select a team...</option>
-                  {teams?.map(team => (
-                    <option key={team.ID} value={team.ID}>
-                      {team.Name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
               <div>
                 <label htmlFor="sport" className="block text-sm font-medium text-gray-700 mb-1">
                   Sport *
@@ -362,6 +342,26 @@ const MedalsAdmin: React.FC = () => {
                   {sports?.map(sport => (
                     <option key={sport.ID} value={sport.ID}>
                       {sport.Name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="team" className="block text-sm font-medium text-gray-700 mb-1">
+                  Team *
+                </label>
+                <select
+                  id="team"
+                  value={formData.TeamID}
+                  onChange={(e) => setFormData({ ...formData, TeamID: e.target.value })}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  required
+                >
+                  <option value="">Select a team...</option>
+                  {teams?.map(team => (
+                    <option key={team.ID} value={team.ID}>
+                      {team.Name}
                     </option>
                   ))}
                 </select>
