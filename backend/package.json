@@ -20,9 +20,11 @@
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
     "@types/node": "^18.19.111",
+    "@types/pg": "^8.15.4",
     "@types/proper-lockfile": "^4.1.2",
     "cors": "^2.8.5",
     "express": "^4.18.2",
+    "pg": "^8.16.2",
     "proper-lockfile": "^4.1.2",
     "xlsx": "^0.18.5"
   },
