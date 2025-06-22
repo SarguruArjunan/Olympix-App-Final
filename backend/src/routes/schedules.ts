@@ -1,5 +1,5 @@
 import express, { Request, Response, Router } from 'express';
-import { ExcelService } from '../services/excel.service';
+import { JsonService } from '../services/json.service';
 import { Event } from '../types';
 
 const router: Router = express.Router();
@@ -7,7 +7,7 @@ const router: Router = express.Router();
 // Get all schedules
 router.get('/', async (_req: Request, res: Response) => {
   try {
-    const events = await ExcelService.readSheet<Event>('Events');
+    const events = await JsonService.readSheet<Event>('Events');
     res.json({ success: true, data: events });
   } catch (error) {
     console.error('Error fetching schedules:', error);
@@ -22,7 +22,7 @@ router.get('/', async (_req: Request, res: Response) => {
 router.get('/sport/:sportId', async (req: Request, res: Response) => {
   try {
     const sportId = Number(req.params.sportId);
-    const events = await ExcelService.readSheet<Event>('Events');
+    const events = await JsonService.readSheet<Event>('Events');
     const sportEvents = events.filter(event => event.SportID === sportId);
     
     res.json({ success: true, data: sportEvents });
@@ -39,7 +39,7 @@ router.get('/sport/:sportId', async (req: Request, res: Response) => {
 router.get('/team/:teamId', async (req: Request, res: Response) => {
   try {
     const teamId = Number(req.params.teamId);
-    const events = await ExcelService.readSheet<Event>('Events');
+    const events = await JsonService.readSheet<Event>('Events');
     const teamEvents = events.filter(event => 
       event.TeamA_ID === teamId || event.TeamB_ID === teamId
     );
@@ -58,7 +58,7 @@ router.get('/team/:teamId', async (req: Request, res: Response) => {
 router.get('/:id', async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
-    const events = await ExcelService.readSheet<Event>('Events');
+    const events = await JsonService.readSheet<Event>('Events');
     const event = events.find(e => e.ID === id);
     
     if (!event) {
@@ -81,7 +81,8 @@ router.get('/:id', async (req: Request, res: Response) => {
 // Create new event
 router.post('/', async (req: Request, res: Response) => {
   try {
-    console.log('Creating event with data:', req.body);
+    console.log('🎯 BACKEND: Received event creation request');
+    console.log('🎯 BACKEND: Event data:', req.body);
     const { SportID, Name, Date, Time, Location, TeamA_ID, TeamB_ID, Status } = req.body;
     
     // Validate required fields
@@ -120,11 +121,12 @@ router.post('/', async (req: Request, res: Response) => {
     };
 
     console.log('Attempting to save event:', eventData);
-    await ExcelService.appendToSheet<Event>('Events', eventData);
+    const newEvent = await JsonService.appendToSheet<Event>('Events', eventData);
     console.log('Event created successfully');
     
     return res.status(201).json({
       success: true,
+      data: newEvent,
       message: 'Event created successfully'
     });
   } catch (error) {
@@ -169,10 +171,11 @@ router.put('/:id', async (req: Request, res: Response) => {
     if (TeamB_Score !== undefined) updateData.TeamB_Score = TeamB_Score;
     if (ResultNotes !== undefined) updateData.ResultNotes = ResultNotes;
 
-    await ExcelService.updateInSheet<Event>('Events', id, updateData);
+    const updatedEvent = await JsonService.updateInSheet<Event>('Events', id, updateData);
     
     return res.json({
       success: true,
+      data: updatedEvent,
       message: 'Event updated successfully'
     });
   } catch (error) {
@@ -196,7 +199,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
     
-    await ExcelService.deleteFromSheet<Event>('Events', id);
+    await JsonService.deleteFromSheet<Event>('Events', id);
     
     return res.json({
       success: true,

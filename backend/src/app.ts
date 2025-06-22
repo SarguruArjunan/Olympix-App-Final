@@ -13,7 +13,9 @@ const app = express();
 app.use(cors({
   origin: [
     'https://olympix-app-final.vercel.app',
-    'http://localhost:3000', // for development
+    'http://localhost:3000', // for backend
+    'http://localhost:3001', // for frontend development
+    'http://localhost:3002', // for frontend development (alternative port)
   ],
   credentials: true
 }));
@@ -29,7 +31,7 @@ app.use((req, _res, next) => {
 
 // Data directory path
 export const DATA_DIR = join(__dirname, '../data');
-export const EXCEL_FILE = join(DATA_DIR, 'EventData.xlsx');
+export const EXCEL_FILE = join(DATA_DIR, 'EventData.xlsx'); // Keep for potential Excel admin tools
 
 // Health check endpoint
 app.get('/', (_req, res) => {

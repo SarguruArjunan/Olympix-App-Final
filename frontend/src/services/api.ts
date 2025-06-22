@@ -6,7 +6,8 @@ class ApiService {
   private async fetchWithErrorHandling<T>(endpoint: string): Promise<T> {
     try {
       const url = `${API_BASE_URL}${endpoint}`;
-      console.log(`Attempting to fetch: ${url}`);
+      console.log(`🌐 API Request: ${url}`);
+      console.log(`🔧 API_BASE_URL: ${API_BASE_URL}`);
       
       // Create timeout signal for better browser compatibility
       const controller = new AbortController();
@@ -55,8 +56,12 @@ class ApiService {
     context: string
   ): Promise<T> {
     try {
-      return await apiCall();
+      console.log(`🔄 ${context}: Attempting API call...`);
+      const result = await apiCall();
+      console.log(`✅ ${context}: API call successful`);
+      return result;
     } catch (error) {
+      console.error(`❌ ${context}: API call failed`, error);
       console.warn(`${context}: API unavailable, using fallback data`, error);
       
       // Show a user-friendly notification that we're using demo data
@@ -380,6 +385,9 @@ class ApiService {
   }
 
   async createEvent(eventData: Omit<Event, 'ID'>): Promise<void> {
+    console.log(`🎯 Creating event:`, eventData);
+    console.log(`🌐 API URL: ${API_BASE_URL}/schedules`);
+    
     const response = await fetch(`${API_BASE_URL}/schedules`, {
       method: 'POST',
       headers: {
@@ -387,6 +395,8 @@ class ApiService {
       },
       body: JSON.stringify(eventData),
     });
+    
+    console.log(`📡 Response status: ${response.status}`);
 
     if (!response.ok) {
       throw new Error(`Failed to create event: ${response.statusText}`);

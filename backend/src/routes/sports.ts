@@ -1,5 +1,5 @@
 import express, { Request, Response, Router } from 'express';
-import { ExcelService } from '../services/excel.service';
+import { JsonService } from '../services/json.service';
 import { Sport } from '../types';
 
 const router: Router = express.Router();
@@ -7,7 +7,7 @@ const router: Router = express.Router();
 // Get all sports
 router.get('/', async (_req: Request, res: Response) => {
   try {
-    const sports = await ExcelService.readSheet<Sport>('Sports');
+    const sports = await JsonService.readSheet<Sport>('Sports');
     res.json({ success: true, data: sports });
   } catch (error) {
     console.error('Error fetching sports:', error);
@@ -25,7 +25,7 @@ interface SportParams {
 // Get sport by ID
 router.get('/:id', async (req: Request<SportParams>, res: Response) => {
   try {
-    const sports = await ExcelService.readSheet<Sport>('Sports');
+    const sports = await JsonService.readSheet<Sport>('Sports');
     const sport = sports.find(s => s.ID === Number(req.params.id));
     
     if (!sport) {
@@ -82,7 +82,7 @@ router.post('/', async (req: Request<{}, {}, CreateSportBody>, res: Response) =>
     }
 
     // Check if sport already exists
-    const sports = await ExcelService.readSheet<Sport>('Sports');
+    const sports = await JsonService.readSheet<Sport>('Sports');
     if (sports.some(s => s.Name === Name)) {
       res.status(400).json({
         success: false,
@@ -91,15 +91,16 @@ router.post('/', async (req: Request<{}, {}, CreateSportBody>, res: Response) =>
       return;
     }
 
-    await ExcelService.appendToSheet<Sport>('Sports', {
+    const newSport = await JsonService.appendToSheet<Sport>('Sports', {
       Name,
       Icon_URL: Icon_URL || '',
       Description
     });
 
-    res.status(201).json({ 
-      success: true, 
-      message: 'Sport created successfully' 
+    res.status(201).json({
+      success: true,
+      data: newSport,
+      message: 'Sport created successfully'
     });
   } catch (error) {
     console.error('Error creating sport:', error);
@@ -122,7 +123,7 @@ router.put('/:id', async (req: Request<SportParams, {}, UpdateSportBody>, res: R
     const sportId = Number(req.params.id);
     const { Icon_URL, Description } = req.body;
 
-    const sports = await ExcelService.readSheet<Sport>('Sports');
+    const sports = await JsonService.readSheet<Sport>('Sports');
     const sport = sports.find(s => s.ID === sportId);
 
     if (!sport) {
@@ -133,14 +134,15 @@ router.put('/:id', async (req: Request<SportParams, {}, UpdateSportBody>, res: R
       return;
     }
 
-    await ExcelService.updateInSheet<Sport>('Sports', sportId, {
+    const updatedSport = await JsonService.updateInSheet<Sport>('Sports', sportId, {
       Icon_URL,
       Description
     });
 
-    res.json({ 
-      success: true, 
-      message: 'Sport updated successfully' 
+    res.json({
+      success: true,
+      data: updatedSport,
+      message: 'Sport updated successfully'
     });
   } catch (error) {
     console.error('Error updating sport:', error);
@@ -156,7 +158,7 @@ router.delete('/:id', async (req: Request<SportParams>, res: Response) => {
   try {
     const sportId = Number(req.params.id);
     
-    const sports = await ExcelService.readSheet<Sport>('Sports');
+    const sports = await JsonService.readSheet<Sport>('Sports');
     const sport = sports.find(s => s.ID === sportId);
 
     if (!sport) {
@@ -167,7 +169,7 @@ router.delete('/:id', async (req: Request<SportParams>, res: Response) => {
       return;
     }
 
-    await ExcelService.deleteFromSheet('Sports', sportId);
+    await JsonService.deleteFromSheet('Sports', sportId);
 
     res.json({ 
       success: true, 

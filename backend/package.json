@@ -8,7 +8,10 @@
     "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/server.ts",
     "build": "tsc",
     "lint": "eslint . --ext .ts",
-    "test": "jest"
+    "test": "jest",
+    "convert-excel": "ts-node src/utils/excel-to-json-converter.ts",
+    "create-sample-data": "ts-node src/utils/excel-to-json-converter.ts --sample",
+    "validate-data": "ts-node -e \"require('./src/services/json.service.ts').JsonService.validateDataFiles().then((result: boolean) => console.log('Validation:', result ? 'PASSED' : 'FAILED'))\""
   },
   "keywords": [],
   "author": "",

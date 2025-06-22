@@ -1,89 +1,44 @@
 import app from './app';
-import { ExcelService } from './services/excel.service';
-import initializeData from './utils/initializeData';
-import { promises as fs } from 'fs';
-import { DATA_DIR } from './app';
+import { JsonService } from './services/json.service';
 
-const PORT = process.env.PORT || 3001;
-
-async function ensureDataDirectory() {
-  try {
-    await fs.access(DATA_DIR);
-  } catch {
-    console.log('Creating data directory...');
-    await fs.mkdir(DATA_DIR, { recursive: true });
-  }
-}
+const PORT = process.env.PORT || 3000;
 
 async function startServer() {
   try {
-    // Ensure data directory exists
-    await ensureDataDirectory();
-    console.log('Data directory checked');
-
-    // Initialize Excel workbook with required sheets
-    await ExcelService.initializeWorkbook();
-    console.log('Excel workbook initialized successfully');
-
-    // Validate Excel file integrity
-    const isValid = await ExcelService.validateExcelFile();
+    // Validate JSON data files before starting
+    console.log('🔍 Validating JSON data files...');
+    const isValid = await JsonService.validateDataFiles();
+    
     if (!isValid) {
-      console.error('Excel file validation failed - data may be corrupted');
-      // Don't exit, but log the issue
+      console.error('❌ JSON data files validation failed. Please check your data files.');
+      process.exit(1);
     }
-
-    // Initialize sample data
-    await initializeData();
-    console.log('Sample data loaded successfully');
-
-    // Start server only after successful initialization
+    
+    console.log('✅ JSON data files validation passed');
+    
+    // Start the server
     app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
-      console.log('Available API endpoints:');
-      console.log('- GET    /api/v1/sports');
-      console.log('- GET    /api/v1/sports/:id');
-      console.log('- POST   /api/v1/sports');
-      console.log('- PUT    /api/v1/sports/:id');
-      console.log('- DELETE /api/v1/sports/:id');
-      console.log('- GET    /api/v1/teams');
-      console.log('- GET    /api/v1/teams/:id');
-      console.log('- POST   /api/v1/teams');
-      console.log('- PUT    /api/v1/teams/:id');
-      console.log('- DELETE /api/v1/teams/:id');
-      console.log('- GET    /api/v1/players');
-      console.log('- GET    /api/v1/players/:id');
-      console.log('- POST   /api/v1/players');
-      console.log('- PUT    /api/v1/players/:id');
-      console.log('- DELETE /api/v1/players/:id');
-      console.log('- GET    /api/v1/schedules');
-      console.log('- GET    /api/v1/schedules/:id');
-      console.log('- GET    /api/v1/schedules/sport/:sportId');
-      console.log('- GET    /api/v1/schedules/team/:teamId');
-      console.log('- POST   /api/v1/schedules');
-      console.log('- PUT    /api/v1/schedules/:id');
-      console.log('- DELETE /api/v1/schedules/:id');
-      console.log('- GET    /api/v1/medals');
-      console.log('- GET    /api/v1/medals/:id');
-      console.log('- POST   /api/v1/medals');
-      console.log('- PUT    /api/v1/medals/:id');
-      console.log('- DELETE /api/v1/medals/:id');
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`📊 Using JSON-based data storage`);
+      console.log(`📁 Data directory: ${require('path').join(__dirname, '../data')}`);
+      console.log(`🌐 Server ready at http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.error('Failed to start server:', error);
-    if (error instanceof Error) {
-      console.error('Error details:', error.message);
-      if ('code' in error) {
-        console.error('Error code:', (error as NodeJS.ErrnoException).code);
-      }
-    }
+    console.error('❌ Failed to start server:', error);
     process.exit(1);
   }
 }
 
-// Handle any unhandled promise rejections
-process.on('unhandledRejection', (error) => {
-  console.error('Unhandled promise rejection:', error);
-  process.exit(1);
+// Handle graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('🛑 SIGTERM received, shutting down gracefully');
+  process.exit(0);
 });
 
+process.on('SIGINT', () => {
+  console.log('🛑 SIGINT received, shutting down gracefully');
+  process.exit(0);
+});
+
+// Start the server
 startServer();

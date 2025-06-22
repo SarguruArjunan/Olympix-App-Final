@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { ExcelService } from '../services/excel.service';
+import { JsonService } from '../services/json.service';
 import { Medal, Team, Sport } from '../types';
 
 const router = Router();
@@ -7,7 +7,7 @@ const router = Router();
 // GET /api/v1/medals
 router.get('/', async (_req, res) => {
   try {
-    const medals = await ExcelService.readSheet<Medal>('Medals');
+    const medals = await JsonService.readSheet<Medal>('Medals');
     return res.json({ success: true, data: medals });
   } catch (error) {
     console.error('Error fetching medals:', error);
@@ -21,7 +21,7 @@ router.get('/', async (_req, res) => {
 // GET /api/v1/medals/:id
 router.get('/:id', async (req, res) => {
   try {
-    const medals = await ExcelService.readSheet<Medal>('Medals');
+    const medals = await JsonService.readSheet<Medal>('Medals');
     const medal = medals.find(m => m.ID === parseInt(req.params.id));
     
     if (!medal) {
@@ -76,7 +76,7 @@ router.post('/', async (req, res) => {
     }
 
     // Validate team exists
-    const teams = await ExcelService.readSheet<Team>('Teams');
+    const teams = await JsonService.readSheet<Team>('Teams');
     if (!teams.some(team => team.ID === TeamID)) {
       return res.status(400).json({
         success: false,
@@ -85,7 +85,7 @@ router.post('/', async (req, res) => {
     }
 
     // Validate sport exists
-    const sports = await ExcelService.readSheet<Sport>('Sports');
+    const sports = await JsonService.readSheet<Sport>('Sports');
     if (!sports.some(sport => sport.ID === SportID)) {
       return res.status(400).json({
         success: false,
@@ -94,7 +94,7 @@ router.post('/', async (req, res) => {
     }
 
     // Check if medal entry already exists for this team and sport
-    const medals = await ExcelService.readSheet<Medal>('Medals');
+    const medals = await JsonService.readSheet<Medal>('Medals');
     if (medals.some(medal => medal.TeamID === TeamID && medal.SportID === SportID)) {
       return res.status(400).json({
         success: false,
@@ -102,7 +102,7 @@ router.post('/', async (req, res) => {
       });
     }
 
-    await ExcelService.appendToSheet<Medal>('Medals', {
+    const newMedal = await JsonService.appendToSheet<Medal>('Medals', {
       TeamID,
       SportID,
       Gold,
@@ -110,9 +110,10 @@ router.post('/', async (req, res) => {
       Bronze,
       Total
     });
-    return res.status(201).json({ 
+    return res.status(201).json({
       success: true,
-      message: 'Medal added successfully' 
+      data: newMedal,
+      message: 'Medal added successfully'
     });
   } catch (error) {
     console.error('Error adding medal:', error);
@@ -172,7 +173,7 @@ router.put('/:id', async (req, res) => {
     }
 
     // Validate team exists
-    const teams = await ExcelService.readSheet<Team>('Teams');
+    const teams = await JsonService.readSheet<Team>('Teams');
     if (!teams.some(team => team.ID === teamIDInt)) {
       return res.status(400).json({
         success: false,
@@ -181,7 +182,7 @@ router.put('/:id', async (req, res) => {
     }
 
     // Validate sport exists
-    const sports = await ExcelService.readSheet<Sport>('Sports');
+    const sports = await JsonService.readSheet<Sport>('Sports');
     if (!sports.some(sport => sport.ID === sportIDInt)) {
       return res.status(400).json({
         success: false,
@@ -189,7 +190,7 @@ router.put('/:id', async (req, res) => {
       });
     }
 
-    await ExcelService.updateInSheet<Medal>('Medals', parseInt(req.params.id), {
+    const updatedMedal = await JsonService.updateInSheet<Medal>('Medals', parseInt(req.params.id), {
       TeamID: teamIDInt,
       SportID: sportIDInt,
       Gold: goldInt,
@@ -197,9 +198,10 @@ router.put('/:id', async (req, res) => {
       Bronze: bronzeInt,
       Total: totalInt
     });
-    return res.json({ 
+    return res.json({
       success: true,
-      message: 'Medal updated successfully' 
+      data: updatedMedal,
+      message: 'Medal updated successfully'
     });
   } catch (error) {
     console.error('Error updating medal:', error);
@@ -213,7 +215,7 @@ router.put('/:id', async (req, res) => {
 // DELETE /api/v1/medals/:id
 router.delete('/:id', async (req, res) => {
   try {
-    await ExcelService.deleteFromSheet<Medal>('Medals', parseInt(req.params.id));
+    await JsonService.deleteFromSheet<Medal>('Medals', parseInt(req.params.id));
     return res.json({ message: 'Medal deleted successfully' });
   } catch (error) {
     console.error('Error deleting medal:', error);

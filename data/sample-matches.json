@@ -1,0 +1,44 @@
+{
+  "Matches": [
+    {
+      "ID": 1,
+      "EventID": 1,
+      "ParticipantA_ID": 1,
+      "ParticipantB_ID": 2,
+      "ScoreA": 3,
+      "ScoreB": 1,
+      "WinnerID": 1,
+      "Status": "Completed"
+    },
+    {
+      "ID": 2,
+      "EventID": 2,
+      "ParticipantA_ID": 2,
+      "ParticipantB_ID": 3,
+      "ScoreA": 2,
+      "ScoreB": 1,
+      "WinnerID": 2,
+      "Status": "Completed"
+    },
+    {
+      "ID": 3,
+      "EventID": 3,
+      "ParticipantA_ID": 1,
+      "ParticipantB_ID": 4,
+      "ScoreA": 0,
+      "ScoreB": 0,
+      "WinnerID": 0,
+      "Status": "In Progress"
+    },
+    {
+      "ID": 4,
+      "EventID": 4,
+      "ParticipantA_ID": 4,
+      "ParticipantB_ID": 5,
+      "ScoreA": 0,
+      "ScoreB": 0,
+      "WinnerID": 0,
+      "Status": "Scheduled"
+    }
+  ]
+}

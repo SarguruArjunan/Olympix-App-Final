@@ -16,17 +16,25 @@ async function loadDataFromFiles() {
     const teamsData = await fs.readFile(join(dataDir, 'sample-teams.json'), 'utf-8');
     const medalsData = await fs.readFile(join(dataDir, 'sample-medals.json'), 'utf-8');
     const sportsData = await fs.readFile(join(dataDir, 'sample-sports.json'), 'utf-8');
+    const playersData = await fs.readFile(join(dataDir, 'sample-players.json'), 'utf-8');
+    const eventsData = await fs.readFile(join(dataDir, 'sample-events.json'), 'utf-8');
+    const matchesData = await fs.readFile(join(dataDir, 'sample-matches.json'), 'utf-8');
     
     const teams = JSON.parse(teamsData).Teams;
     const medals = JSON.parse(medalsData).Medals;
     const sports = JSON.parse(sportsData).Sports;
+    const players = JSON.parse(playersData).Players;
+    const events = JSON.parse(eventsData).Events;
+    const matches = JSON.parse(matchesData).Matches;
     
     return {
       sports,
       teams,
       medals,
-      players: [], // Will need to add players.json if needed
-      schedules: dynamicData.schedules // Use in-memory data for events
+      players,
+      events,
+      matches,
+      schedules: [...events, ...dynamicData.schedules] // Combine static events with dynamic ones
     };
   } catch (error) {
     console.error('Error loading data from files:', error);
@@ -75,6 +83,8 @@ function getStaticData() {
       { ID: 9, TeamID: 3, SportID: 9, Gold: 0, Silver: 1, Bronze: 0, Total: 1 }
     ],
     players: [],
+    events: [],
+    matches: [],
     schedules: dynamicData.schedules
   };
 }
@@ -84,8 +94,10 @@ let nextId = {
   sports: 10, // Next ID after the 9 existing sports
   teams: 13,  // Next ID after the 12 existing teams
   medals: 10, // Next ID after the 9 existing medals
-  players: 1,
-  schedules: 1
+  players: 11, // Next ID after the 10 existing players
+  events: 7,   // Next ID after the 6 existing events
+  matches: 5,  // Next ID after the 4 existing matches
+  schedules: 1000 // Start high for dynamic schedules to avoid conflicts
 };
 
 function generateId(type: keyof typeof nextId): number {
@@ -241,6 +253,56 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           success: true,
           data: newPlayer,
           message: 'Player created successfully'
+        });
+        return;
+      }
+    }
+
+    if (pathStr === 'events') {
+      if (req.method === 'GET') {
+        res.status(200).json({
+          success: true,
+          data: mockData.events
+        });
+        return;
+      }
+      
+      if (req.method === 'POST') {
+        console.log('Creating new event:', req.body);
+        const newEvent = {
+          ID: generateId('events'),
+          ...req.body
+        };
+        mockData.events.push(newEvent);
+        res.status(201).json({
+          success: true,
+          data: newEvent,
+          message: 'Event created successfully'
+        });
+        return;
+      }
+    }
+
+    if (pathStr === 'matches') {
+      if (req.method === 'GET') {
+        res.status(200).json({
+          success: true,
+          data: mockData.matches
+        });
+        return;
+      }
+      
+      if (req.method === 'POST') {
+        console.log('Creating new match:', req.body);
+        const newMatch = {
+          ID: generateId('matches'),
+          ...req.body
+        };
+        mockData.matches.push(newMatch);
+        res.status(201).json({
+          success: true,
+          data: newMatch,
+          message: 'Match created successfully'
         });
         return;
       }
@@ -482,12 +544,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Default response for unknown routes
     console.log(`ROUTE NOT FOUND: ${req.method} ${pathStr}`);
-    console.log('Available routes:', ['health', 'sports', 'teams', 'medals', 'players', 'schedules']);
+    console.log('Available routes:', ['health', 'sports', 'teams', 'medals', 'players', 'events', 'matches', 'schedules']);
     
     res.status(200).json({
       success: true,
       message: `Route not implemented: ${req.method} ${pathStr}`,
-      availableRoutes: ['health', 'sports', 'teams', 'medals', 'players', 'schedules'],
+      availableRoutes: ['health', 'sports', 'teams', 'medals', 'players', 'events', 'matches', 'schedules'],
       requestMethod: req.method,
       requestPath: pathStr,
       timestamp: new Date().toISOString()

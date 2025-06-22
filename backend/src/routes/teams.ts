@@ -1,5 +1,5 @@
 import { Request, Response, Router } from 'express';
-import { ExcelService } from '../services/excel.service';
+import { JsonService } from '../services/json.service';
 import { Team } from '../types';
 
 const router = Router();
@@ -7,7 +7,7 @@ const router = Router();
 // GET /api/v1/teams
 router.get('/', async (_req, res) => {
   try {
-    const teams = await ExcelService.readSheet<Team>('Teams');
+    const teams = await JsonService.readSheet<Team>('Teams');
     return res.json({
       success: true,
       data: teams
@@ -24,7 +24,7 @@ router.get('/', async (_req, res) => {
 // GET /api/v1/teams/:id
 router.get('/:id', async (req, res) => {
   try {
-    const teams = await ExcelService.readSheet<Team>('Teams');
+    const teams = await JsonService.readSheet<Team>('Teams');
     const team = teams.find(t => t.ID === parseInt(req.params.id));
     
     if (!team) {
@@ -69,10 +69,11 @@ router.post('/', async (req: Request, res: Response) => {
       Color: Color || '#000000'
     };
 
-    await ExcelService.appendToSheet<Team>('Teams', teamData);
+    const newTeam = await JsonService.appendToSheet<Team>('Teams', teamData);
     
     return res.status(201).json({
       success: true,
+      data: newTeam,
       message: 'Team created successfully'
     });
   } catch (error) {
@@ -98,10 +99,11 @@ router.put('/:id', async (req: Request, res: Response) => {
     if (TagLine !== undefined) updateData.TagLine = TagLine;
     if (Color !== undefined) updateData.Color = Color;
 
-    await ExcelService.updateInSheet<Team>('Teams', id, updateData);
+    const updatedTeam = await JsonService.updateInSheet<Team>('Teams', id, updateData);
     
     return res.json({
       success: true,
+      data: updatedTeam,
       message: 'Team updated successfully'
     });
   } catch (error) {
@@ -125,7 +127,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
     
-    await ExcelService.deleteFromSheet<Team>('Teams', id);
+    await JsonService.deleteFromSheet<Team>('Teams', id);
     
     return res.json({
       success: true,
