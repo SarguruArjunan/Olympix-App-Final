@@ -79,6 +79,9 @@ Thumbs.db
 # These files contain dynamic data that should not override production
 data/*_backup_*.json
 
+# Production data directory - contains actual production data
+data/production/
+
 # Keep base/template data but ignore dynamic changes during development
 # Uncomment these lines if you want to prevent local data changes from affecting production:
 # data/sample-events.json

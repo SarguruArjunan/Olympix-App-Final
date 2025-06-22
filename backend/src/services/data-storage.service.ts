@@ -3,8 +3,8 @@ import { join } from 'path';
 import { SheetName, SheetData } from '../types';
 
 // Environment-based data storage service
-// Production: Uses Vercel KV or external storage
-// Development: Uses local JSON files
+// Production: Uses separate JSON files in data/production/
+// Development: Uses local JSON files in data/
 
 interface StorageAdapter {
   read<T>(key: string): Promise<T[]>;
@@ -106,53 +106,119 @@ class LocalFileAdapter implements StorageAdapter {
   }
 }
 
-// Production adapter using in-memory storage with persistence
+// Production JSON file adapter - uses separate directory for persistent storage
 class ProductionAdapter implements StorageAdapter {
-  private static dataCache: { [key: string]: any[] } = {};
+  private readonly prodDataDir = join(__dirname, '../../../data/production');
   
-  // Initialize with base data from repository (one-time setup)
+  private getFilePath(key: string): string {
+    return join(this.prodDataDir, `prod-${key.toLowerCase()}.json`);
+  }
+
+  private async ensureProdDataDir(): Promise<void> {
+    try {
+      await fs.access(this.prodDataDir);
+    } catch {
+      await fs.mkdir(this.prodDataDir, { recursive: true });
+      console.log(`🚀 PROD: Created production data directory: ${this.prodDataDir}`);
+    }
+  }
+
   private async initializeIfEmpty(key: string): Promise<void> {
-    if (!ProductionAdapter.dataCache[key]) {
+    const filePath = this.getFilePath(key);
+    
+    try {
+      await fs.access(filePath);
+      // File exists, no need to initialize
+    } catch {
+      // File doesn't exist, initialize with base data
       try {
-        // Try to load initial data from repository files (fallback)
-        const localAdapter = new LocalFileAdapter();
-        const initialData = await localAdapter.read(key);
-        ProductionAdapter.dataCache[key] = [...initialData];
-        console.log(`🚀 PROD: Initialized ${key} with ${initialData.length} records from base data`);
+        console.log(`🚀 PROD: Initializing ${key} with base data from repository`);
+        const basePath = join(__dirname, '../../../data', `sample-${key.toLowerCase()}.json`);
+        const baseData = await fs.readFile(basePath, 'utf-8');
+        const jsonData = JSON.parse(baseData);
+        
+        let initialData = [];
+        if (jsonData[key]) {
+          initialData = jsonData[key];
+        } else if (Array.isArray(jsonData)) {
+          initialData = jsonData;
+        } else {
+          const dataArray = Object.values(jsonData).find(val => Array.isArray(val));
+          initialData = (dataArray as any[]) || [];
+        }
+        
+        await this.ensureProdDataDir();
+        const prodData = { [key]: initialData };
+        await fs.writeFile(filePath, JSON.stringify(prodData, null, 2), 'utf-8');
+        console.log(`🚀 PROD: Initialized ${key} with ${initialData.length} records in production file`);
       } catch (error) {
-        console.warn(`🚀 PROD: Could not load initial data for ${key}, starting empty`);
-        ProductionAdapter.dataCache[key] = [];
+        console.warn(`🚀 PROD: Could not initialize ${key}, creating empty file`);
+        await this.ensureProdDataDir();
+        const emptyData = { [key]: [] };
+        await fs.writeFile(filePath, JSON.stringify(emptyData, null, 2), 'utf-8');
       }
     }
   }
 
   async read<T>(key: string): Promise<T[]> {
     await this.initializeIfEmpty(key);
-    return [...ProductionAdapter.dataCache[key]] as T[];
+    
+    try {
+      const filePath = this.getFilePath(key);
+      const data = await fs.readFile(filePath, 'utf-8');
+      const jsonData = JSON.parse(data);
+      
+      if (jsonData[key]) {
+        return jsonData[key];
+      } else if (Array.isArray(jsonData)) {
+        return jsonData;
+      } else {
+        const dataArray = Object.values(jsonData).find(val => Array.isArray(val));
+        return dataArray as T[] || [];
+      }
+    } catch (error) {
+      console.error(`🚀 PROD: Error reading ${key}:`, error);
+      return [];
+    }
   }
 
   async write<T>(key: string, data: T[]): Promise<void> {
-    ProductionAdapter.dataCache[key] = [...data];
-    console.log(`🚀 PROD: Stored ${data.length} records in memory for ${key}`);
-    
-    // In a real production setup, you would persist to external storage here
-    // Examples: Vercel KV, PostgreSQL, MongoDB, etc.
+    try {
+      await this.ensureProdDataDir();
+      const filePath = this.getFilePath(key);
+      
+      // Create backup before writing
+      try {
+        const backupPath = filePath.replace('.json', `_backup_${Date.now()}.json`);
+        await fs.copyFile(filePath, backupPath);
+        console.log(`🚀 PROD: Backup created for ${key}`);
+      } catch (error) {
+        // Backup failed, but continue (file might not exist yet)
+      }
+      
+      const jsonData = { [key]: data };
+      await fs.writeFile(filePath, JSON.stringify(jsonData, null, 2), 'utf-8');
+      console.log(`🚀 PROD: Wrote ${data.length} records to production file for ${key}`);
+    } catch (error) {
+      console.error(`🚀 PROD: Error writing ${key}:`, error);
+      throw error;
+    }
   }
 
   async append<T extends SheetData>(key: string, data: Omit<T, 'ID'>): Promise<T> {
-    await this.initializeIfEmpty(key);
-    const existingData = ProductionAdapter.dataCache[key] as T[];
+    const existingData = await this.read<T>(key);
     const newId = existingData.length ? Math.max(...existingData.map(r => r.ID)) + 1 : 1;
     const newRecord = { ID: newId, ...data } as T;
     
-    ProductionAdapter.dataCache[key].push(newRecord);
-    console.log(`🚀 PROD: Appended record to ${key} with ID ${newId}`);
+    existingData.push(newRecord);
+    await this.write(key, existingData);
+    
+    console.log(`🚀 PROD: Appended record to ${key} with ID ${newId} in production file`);
     return newRecord;
   }
 
   async update<T extends SheetData>(key: string, id: number, data: Partial<Omit<T, 'ID'>>): Promise<T> {
-    await this.initializeIfEmpty(key);
-    const existingData = ProductionAdapter.dataCache[key] as T[];
+    const existingData = await this.read<T>(key);
     const index = existingData.findIndex(r => r.ID === id);
     
     if (index === -1) {
@@ -160,21 +226,22 @@ class ProductionAdapter implements StorageAdapter {
     }
     
     existingData[index] = { ...existingData[index], ...data } as T;
-    console.log(`🚀 PROD: Updated record ${id} in ${key}`);
+    await this.write(key, existingData);
+    
+    console.log(`🚀 PROD: Updated record ${id} in ${key} production file`);
     return existingData[index];
   }
 
   async delete(key: string, id: number): Promise<void> {
-    await this.initializeIfEmpty(key);
-    const existingData = ProductionAdapter.dataCache[key];
-    const originalLength = existingData.length;
-    ProductionAdapter.dataCache[key] = existingData.filter(r => r.ID !== id);
+    const existingData = await this.read(key);
+    const filteredData = existingData.filter((r: any) => r.ID !== id);
     
-    if (ProductionAdapter.dataCache[key].length === originalLength) {
+    if (filteredData.length === existingData.length) {
       throw new Error(`Record with ID ${id} not found in ${key}`);
     }
     
-    console.log(`🚀 PROD: Deleted record ${id} from ${key}`);
+    await this.write(key, filteredData);
+    console.log(`🚀 PROD: Deleted record ${id} from ${key} production file`);
   }
 }
 
@@ -187,10 +254,10 @@ export class DataStorageService {
       const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
       
       if (isProduction) {
-        console.log('🚀 Using Production data adapter (in-memory with persistence)');
+        console.log('🚀 Using Production JSON file adapter (data/production/)');
         this.adapter = new ProductionAdapter();
       } else {
-        console.log('💾 Using Local file adapter for development');
+        console.log('💾 Using Local file adapter for development (data/)');
         this.adapter = new LocalFileAdapter();
       }
     }
@@ -230,10 +297,10 @@ export class DataStorageService {
     
     return {
       environment,
-      adapter: isProduction ? 'ProductionAdapter' : 'LocalFileAdapter',
+      adapter: isProduction ? 'ProductionAdapter (JSON Files)' : 'LocalFileAdapter (JSON Files)',
       message: isProduction 
-        ? 'Production data is isolated in memory - local changes will not affect production'
-        : 'Development uses local JSON files - safe to modify for testing'
+        ? 'Production uses separate JSON files in data/production/ - persistent and isolated'
+        : 'Development uses local JSON files in data/ - safe to modify for testing'
     };
   }
 }
