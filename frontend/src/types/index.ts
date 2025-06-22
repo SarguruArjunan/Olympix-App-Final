@@ -47,6 +47,7 @@ export interface Player {
   LastName: string;
   TeamID: number;
   SportID: number;
+  SecondSportID?: number; // Optional second sport
 }
 
 export interface Match {

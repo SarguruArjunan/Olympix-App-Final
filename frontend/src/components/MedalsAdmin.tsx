@@ -16,7 +16,7 @@ const MedalsAdmin: React.FC = () => {
     Bronze: 0,
     Total: 0
   });
-  const [playerNames, setPlayerNames] = useState<string[]>(Array(8).fill(''));
+  const [selectedPlayerIds, setSelectedPlayerIds] = useState<string[]>([]);
 
   const { data: medals, isLoading: medalsLoading, error: medalsError } = useMedals();
   const { data: teams, isLoading: teamsLoading } = useTeams();
@@ -32,11 +32,28 @@ const MedalsAdmin: React.FC = () => {
   const isSubmitting = createMedalMutation.isPending || updateMedalMutation.isPending;
 
   // Get existing players for the selected team/sport combination
-  const existingPlayers = players?.filter(player => 
+  const existingPlayers = players?.filter(player =>
     formData.TeamID && formData.SportID &&
-    player.TeamID === parseInt(formData.TeamID) && 
+    player.TeamID === parseInt(formData.TeamID) &&
     player.SportID === parseInt(formData.SportID)
   ) || [];
+
+  // Get filtered players for the dropdown (including both primary and secondary sports)
+  const getFilteredPlayers = () => {
+    if (!players || !formData.TeamID || !formData.SportID) {
+      return [];
+    }
+
+    const teamId = parseInt(formData.TeamID);
+    const sportId = parseInt(formData.SportID);
+
+    return players.filter(player =>
+      player.TeamID === teamId &&
+      (player.SportID === sportId || player.SecondSportID === sportId)
+    );
+  };
+
+  const filteredPlayers = getFilteredPlayers();
 
   // Auto-calculate total when individual medal counts change
   useEffect(() => {
@@ -50,6 +67,11 @@ const MedalsAdmin: React.FC = () => {
     }
   }, [formData.Gold, formData.Silver, formData.Bronze, formData.Total]);
 
+  // Clear selected players when team or sport changes
+  useEffect(() => {
+    setSelectedPlayerIds([]);
+  }, [formData.TeamID, formData.SportID]);
+
   const resetForm = () => {
     setFormData({
       TeamID: '',
@@ -59,7 +81,7 @@ const MedalsAdmin: React.FC = () => {
       Bronze: 0,
       Total: 0
     });
-    setPlayerNames(Array(8).fill(''));
+    setSelectedPlayerIds([]);
     setEditingMedal(null);
     setIsFormVisible(false);
   };
@@ -86,10 +108,10 @@ const MedalsAdmin: React.FC = () => {
     }, 100);
   };
 
-  const handlePlayerNameChange = (index: number, value: string) => {
-    const newPlayerNames = [...playerNames];
-    newPlayerNames[index] = value;
-    setPlayerNames(newPlayerNames);
+  const handlePlayerSelection = (index: number, playerId: string) => {
+    const newSelectedPlayerIds = [...selectedPlayerIds];
+    newSelectedPlayerIds[index] = playerId;
+    setSelectedPlayerIds(newSelectedPlayerIds);
   };
 
   const handleDeletePlayer = async (playerId: number) => {
@@ -105,31 +127,11 @@ const MedalsAdmin: React.FC = () => {
     }
   };
 
-  const createPlayersFromNames = async (teamId: number, sportId: number) => {
-    const validPlayerNames = playerNames.filter(name => name.trim() !== '');
-    
-    for (const fullName of validPlayerNames) {
-      const trimmedName = fullName.trim();
-      if (trimmedName) {
-        // Split name into first and last name
-        const nameParts = trimmedName.split(' ');
-        const firstName = nameParts[0];
-        const lastName = nameParts.slice(1).join(' ') || firstName; // Use first name as last name if only one name provided
-        
-        if (firstName) {
-          try {
-            await createPlayerMutation.mutateAsync({
-              FirstName: firstName,
-              LastName: lastName,
-              TeamID: teamId,
-              SportID: sportId
-            });
-          } catch (error) {
-            console.error(`Error creating player ${trimmedName}:`, error);
-            // Continue creating other players even if one fails
-          }
-        }
-      }
+  const logSelectedPlayers = () => {
+    // Log the selected players for debugging
+    const validSelectedPlayerIds = selectedPlayerIds.filter(id => id && id !== '');
+    if (validSelectedPlayerIds.length > 0) {
+      console.log(`Selected existing player IDs: ${validSelectedPlayerIds.join(', ')}`);
     }
   };
 
@@ -205,22 +207,13 @@ const MedalsAdmin: React.FC = () => {
 
       if (editingMedal) {
         await updateMedalMutation.mutateAsync({ id: editingMedal.ID, data: medalData });
-        
-        // Create new players if any names were provided during editing
-        const validPlayerNames = playerNames.filter(name => name.trim() !== '');
-        if (validPlayerNames.length > 0) {
-          await createPlayersFromNames(parseInt(formData.TeamID), parseInt(formData.SportID));
-        }
       } else {
-        // Create medal first
+        // Create medal
         await createMedalMutation.mutateAsync(medalData);
-        
-        // Then create players if any names were provided
-        const validPlayerNames = playerNames.filter(name => name.trim() !== '');
-        if (validPlayerNames.length > 0) {
-          await createPlayersFromNames(parseInt(formData.TeamID), parseInt(formData.SportID));
-        }
       }
+
+      // Log selected players for debugging
+      logSelectedPlayers();
 
       resetForm();
     } catch (error: any) {
@@ -252,9 +245,28 @@ const MedalsAdmin: React.FC = () => {
 
     try {
       await deleteMedalMutation.mutateAsync(id);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting medal:', error);
-      alert('Failed to delete medal');
+      
+      // Provide more specific error messages
+      let errorMessage = 'Failed to delete medal';
+      
+      // Check for specific error types
+      if (error?.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.message) {
+        if (error.message.includes('not found') || error.message.includes('Not found')) {
+          errorMessage = 'This medal record has already been deleted or no longer exists.';
+        } else {
+          errorMessage = `Failed to delete medal: ${error.message}`;
+        }
+      } else if (error?.response?.status === 404) {
+        errorMessage = 'This medal record has already been deleted or no longer exists.';
+      }
+      
+      alert(errorMessage);
     }
   };
 
@@ -496,29 +508,81 @@ const MedalsAdmin: React.FC = () => {
                     }
                   </p>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {playerNames.map((name, index) => (
-                      <div key={index}>
-                        <label htmlFor={`player-${index}`} className="block text-sm font-medium text-gray-700 mb-1">
-                          Player {index + 1}
-                        </label>
-                        <input
-                          type="text"
-                          id={`player-${index}`}
-                          value={name}
-                          onChange={(e) => handlePlayerNameChange(index, e.target.value)}
-                          placeholder="First Last"
-                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                        />
+                  {!formData.TeamID || !formData.SportID ? (
+                    <div className="text-center py-8">
+                      <div className="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100 text-gray-500 text-sm">
+                        Please select team and sport first to see available players
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ) : filteredPlayers.length === 0 ? (
+                    <div className="text-center py-8">
+                      <div className="w-full border border-gray-300 rounded-md px-3 py-2 bg-yellow-50 text-yellow-800 text-sm">
+                        No players available for this team and sport combination
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2">
+                        Players must be added through the Players admin page first
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="mb-4 flex items-center justify-between">
+                        <p className="text-sm text-gray-600">
+                          Select from {filteredPlayers.length} available player(s):
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedPlayerIds([])}
+                          className="text-xs text-gray-500 hover:text-gray-700"
+                        >
+                          Clear All
+                        </button>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        {filteredPlayers.map((player, index) => (
+                          <div key={player.ID}>
+                            <label htmlFor={`player-${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                              Player {index + 1}
+                            </label>
+                            <select
+                              id={`player-${index}`}
+                              value={selectedPlayerIds[index] || ''}
+                              onChange={(e) => handlePlayerSelection(index, e.target.value)}
+                              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                            >
+                              <option value="">Not selected</option>
+                              {filteredPlayers.map((availablePlayer) => (
+                                <option
+                                  key={availablePlayer.ID}
+                                  value={availablePlayer.ID.toString()}
+                                  disabled={selectedPlayerIds.includes(availablePlayer.ID.toString()) && selectedPlayerIds[index] !== availablePlayer.ID.toString()}
+                                >
+                                  {availablePlayer.FirstName} {availablePlayer.LastName}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      <div className="mt-4 p-3 bg-green-50 rounded-md">
+                        <p className="text-sm text-green-800">
+                          💡 <strong>Note:</strong> Each player can only be selected once. Selected players will be associated with this medal record.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                   
                   <div className="mt-3 p-3 bg-blue-50 rounded-md">
                     <p className="text-sm text-blue-800">
-                      💡 <strong>Tip:</strong> Players will be automatically associated with the selected team and sport. 
-                      They will appear on the Star Players page with the medals from this record.
+                      💡 <strong>Enhanced Player Selection:</strong>
                     </p>
+                    <ul className="text-sm text-blue-700 mt-1 space-y-1">
+                      <li>• The system dynamically creates dropdowns for all players matching the selected team and sport</li>
+                      <li>• Each player can only be selected once to prevent duplicates</li>
+                      <li>• Selected players will be associated with this medal record and appear on the Star Players page</li>
+                      <li>• Players must be added through the Players admin page before they can be selected here</li>
+                    </ul>
                   </div>
                 </div>
               </div>
@@ -593,10 +657,10 @@ const MedalsAdmin: React.FC = () => {
                       </button>
                       <button
                         onClick={() => handleDelete(medal.ID)}
-                        className="px-3 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700"
+                        className="px-3 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         disabled={deleteMedalMutation.isPending}
                       >
-                        Delete
+                        {deleteMedalMutation.isPending ? 'Deleting...' : 'Delete'}
                       </button>
                     </div>
                   </div>
@@ -675,10 +739,10 @@ const MedalsAdmin: React.FC = () => {
                           </button>
                           <button
                             onClick={() => handleDelete(medal.ID)}
-                            className="text-red-600 hover:text-red-900 text-left"
+                            className="text-red-600 hover:text-red-900 text-left disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={deleteMedalMutation.isPending}
                           >
-                            Delete
+                            {deleteMedalMutation.isPending ? 'Deleting...' : 'Delete'}
                           </button>
                         </div>
                       </td>

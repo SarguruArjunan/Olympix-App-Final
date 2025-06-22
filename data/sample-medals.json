@@ -1,15 +1,6 @@
 {
   "Medals": [
     {
-      "ID": 1,
-      "TeamID": 1,
-      "SportID": 1,
-      "Gold": 2,
-      "Silver": 1,
-      "Bronze": 0,
-      "Total": 3
-    },
-    {
       "ID": 2,
       "TeamID": 1,
       "SportID": 3,
@@ -80,6 +71,15 @@
       "Silver": 1,
       "Bronze": 0,
       "Total": 1
+    },
+    {
+      "ID": 10,
+      "TeamID": 4,
+      "SportID": 9,
+      "Gold": 2,
+      "Silver": 1,
+      "Bronze": 1,
+      "Total": 4
     }
   ]
-} 
+}

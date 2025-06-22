@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import EventAdmin from '../components/EventAdmin';
 import TeamAdmin from '../components/TeamAdmin';
 import MedalsAdmin from '../components/MedalsAdmin';
+import PlayerAdmin from '../components/PlayerAdmin';
 
 const Admin: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'events' | 'teams' | 'medals'>('events');
+  const [activeTab, setActiveTab] = useState<'events' | 'teams' | 'players' | 'medals'>('events');
 
   return (
     <div className="space-y-6">
@@ -20,27 +21,37 @@ const Admin: React.FC = () => {
             <nav className="-mb-px flex">
               <button
                 onClick={() => setActiveTab('events')}
-                className={`w-1/3 py-4 px-6 text-center border-b-2 font-medium text-lg ${
+                className={`w-1/4 py-4 px-6 text-center border-b-2 font-medium text-lg ${
                   activeTab === 'events'
                     ? 'border-primary text-primary bg-primary/5'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                Event Administration
+                Events
               </button>
               <button
                 onClick={() => setActiveTab('teams')}
-                className={`w-1/3 py-4 px-6 text-center border-b-2 font-medium text-lg ${
+                className={`w-1/4 py-4 px-6 text-center border-b-2 font-medium text-lg ${
                   activeTab === 'teams'
                     ? 'border-primary text-primary bg-primary/5'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                Team Administration
+                Teams
+              </button>
+              <button
+                onClick={() => setActiveTab('players')}
+                className={`w-1/4 py-4 px-6 text-center border-b-2 font-medium text-lg ${
+                  activeTab === 'players'
+                    ? 'border-primary text-primary bg-primary/5'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Players
               </button>
               <button
                 onClick={() => setActiveTab('medals')}
-                className={`w-1/3 py-4 px-6 text-center border-b-2 font-medium text-lg ${
+                className={`w-1/4 py-4 px-6 text-center border-b-2 font-medium text-lg ${
                   activeTab === 'medals'
                     ? 'border-primary text-primary bg-primary/5'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -57,6 +68,8 @@ const Admin: React.FC = () => {
               <EventAdmin />
             ) : activeTab === 'teams' ? (
               <TeamAdmin />
+            ) : activeTab === 'players' ? (
+              <PlayerAdmin />
             ) : (
               <MedalsAdmin />
             )}

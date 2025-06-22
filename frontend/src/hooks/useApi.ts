@@ -266,5 +266,14 @@ export const useDeleteMedal = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['medals'] });
     },
+    onError: (error: any) => {
+      // If the error indicates the record doesn't exist, still refresh the cache
+      // to ensure the UI is in sync with the backend state
+      if (error?.response?.status === 404 ||
+          error?.message?.includes('not found') ||
+          error?.message?.includes('Not found')) {
+        queryClient.invalidateQueries({ queryKey: ['medals'] });
+      }
+    },
   });
-}; 
+};
