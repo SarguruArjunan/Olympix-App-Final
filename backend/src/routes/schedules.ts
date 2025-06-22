@@ -199,7 +199,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
     
-    await JsonService.deleteFromSheet<Event>('Events', id);
+    await JsonService.deleteFromSheet('Events', id);
     
     return res.json({
       success: true,

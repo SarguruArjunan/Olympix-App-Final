@@ -111,7 +111,7 @@ router.put('/:id', async (req, res) => {
 // DELETE /api/v1/players/:id
 router.delete('/:id', async (req, res) => {
   try {
-    await JsonService.deleteFromSheet<Player>('Players', parseInt(req.params.id));
+    await JsonService.deleteFromSheet('Players', parseInt(req.params.id));
     return res.json({
       success: true,
       message: 'Player deleted successfully'

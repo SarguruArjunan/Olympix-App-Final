@@ -109,6 +109,28 @@
       "TeamA_ID": 2,
       "TeamB_ID": 7,
       "Status": "Scheduled"
+    },
+    {
+      "ID": 9,
+      "SportID": 3,
+      "Name": "Test Environment Separation",
+      "Date": "2025-07-01",
+      "Time": "15:30",
+      "Location": "Testing Arena",
+      "TeamA_ID": 1,
+      "TeamB_ID": 3,
+      "Status": "Scheduled"
+    },
+    {
+      "ID": 10,
+      "SportID": 3,
+      "Name": "Test Environment Separation",
+      "Date": "2025-07-01",
+      "Time": "15:30",
+      "Location": "Testing Arena",
+      "TeamA_ID": 1,
+      "TeamB_ID": 3,
+      "Status": "Scheduled"
     }
   ]
 }

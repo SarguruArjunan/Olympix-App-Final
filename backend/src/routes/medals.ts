@@ -215,7 +215,7 @@ router.put('/:id', async (req, res) => {
 // DELETE /api/v1/medals/:id
 router.delete('/:id', async (req, res) => {
   try {
-    await JsonService.deleteFromSheet<Medal>('Medals', parseInt(req.params.id));
+    await JsonService.deleteFromSheet('Medals', parseInt(req.params.id));
     return res.json({ message: 'Medal deleted successfully' });
   } catch (error) {
     console.error('Error deleting medal:', error);

@@ -21,6 +21,10 @@ async function startServer() {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📊 Using JSON-based data storage`);
       console.log(`📁 Data directory: ${require('path').join(__dirname, '../data')}`);
+      
+      // Display storage configuration
+      JsonService.logStorageInfo();
+      
       console.log(`🌐 Server ready at http://localhost:${PORT}`);
     });
   } catch (error) {

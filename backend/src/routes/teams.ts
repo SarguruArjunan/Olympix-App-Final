@@ -127,7 +127,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
     
-    await JsonService.deleteFromSheet<Team>('Teams', id);
+    await JsonService.deleteFromSheet('Teams', id);
     
     return res.json({
       success: true,
