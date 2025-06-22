@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 
-// Mock API data
+// Mock API data with in-memory storage
 const mockData = {
   sports: [
     { ID: 1, Name: "Basketball", Description: "Fast-paced team sport", Icon_URL: "/Icons/basketball.svg" },
@@ -24,6 +24,27 @@ const mockData = {
   players: [],
   schedules: []
 };
+
+// Helper functions for CRUD operations
+let nextId = {
+  sports: 9,
+  teams: 7,
+  medals: 1,
+  players: 1,
+  schedules: 1
+};
+
+function generateId(type: keyof typeof nextId): number {
+  return nextId[type]++;
+}
+
+function findItemById(collection: any[], id: number) {
+  return collection.find(item => item.ID === id);
+}
+
+function findItemIndex(collection: any[], id: number) {
+  return collection.findIndex(item => item.ID === id);
+}
 
 // Production API with proper routing
 export default function handler(req: VercelRequest, res: VercelResponse) {
@@ -68,67 +89,336 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (pathStr === 'sports') {
-      res.status(200).json({
-        success: true,
-        data: mockData.sports
-      });
-      return;
-    }
-
-    if (pathStr === 'teams') {
-      res.status(200).json({
-        success: true,
-        data: mockData.teams
-      });
-      return;
-    }
-
-    if (pathStr === 'medals') {
-      res.status(200).json({
-        success: true,
-        data: mockData.medals
-      });
-      return;
-    }
-
-    if (pathStr === 'players') {
-      res.status(200).json({
-        success: true,
-        data: mockData.players
-      });
-      return;
-    }
-
-    if (pathStr === 'schedules') {
-      res.status(200).json({
-        success: true,
-        data: mockData.schedules
-      });
-      return;
-    }
-
-    // Individual resource routes
-    if (pathStr.startsWith('sports/')) {
-      const id = parseInt(pathStr.split('/')[1]);
-      const sport = mockData.sports.find(s => s.ID === id);
-      if (sport) {
+      if (req.method === 'GET') {
         res.status(200).json({
           success: true,
-          data: sport
+          data: mockData.sports
+        });
+        return;
+      }
+      
+      if (req.method === 'POST') {
+        console.log('Creating new sport:', req.body);
+        const newSport = {
+          ID: generateId('sports'),
+          ...req.body
+        };
+        mockData.sports.push(newSport);
+        res.status(201).json({
+          success: true,
+          data: newSport,
+          message: 'Sport created successfully'
         });
         return;
       }
     }
 
-    if (pathStr.startsWith('teams/')) {
-      const id = parseInt(pathStr.split('/')[1]);
-      const team = mockData.teams.find(t => t.ID === id);
-      if (team) {
+    if (pathStr === 'teams') {
+      if (req.method === 'GET') {
         res.status(200).json({
           success: true,
-          data: team
+          data: mockData.teams
         });
         return;
+      }
+      
+      if (req.method === 'POST') {
+        console.log('Creating new team:', req.body);
+        const newTeam = {
+          ID: generateId('teams'),
+          ...req.body
+        };
+        mockData.teams.push(newTeam);
+        res.status(201).json({
+          success: true,
+          data: newTeam,
+          message: 'Team created successfully'
+        });
+        return;
+      }
+    }
+
+    if (pathStr === 'medals') {
+      if (req.method === 'GET') {
+        res.status(200).json({
+          success: true,
+          data: mockData.medals
+        });
+        return;
+      }
+      
+      if (req.method === 'POST') {
+        console.log('Creating new medal:', req.body);
+        const newMedal = {
+          ID: generateId('medals'),
+          ...req.body
+        };
+        mockData.medals.push(newMedal);
+        res.status(201).json({
+          success: true,
+          data: newMedal,
+          message: 'Medal created successfully'
+        });
+        return;
+      }
+    }
+
+    if (pathStr === 'players') {
+      if (req.method === 'GET') {
+        res.status(200).json({
+          success: true,
+          data: mockData.players
+        });
+        return;
+      }
+      
+      if (req.method === 'POST') {
+        console.log('Creating new player:', req.body);
+        const newPlayer = {
+          ID: generateId('players'),
+          ...req.body
+        };
+        mockData.players.push(newPlayer);
+        res.status(201).json({
+          success: true,
+          data: newPlayer,
+          message: 'Player created successfully'
+        });
+        return;
+      }
+    }
+
+    if (pathStr === 'schedules') {
+      if (req.method === 'GET') {
+        res.status(200).json({
+          success: true,
+          data: mockData.schedules
+        });
+        return;
+      }
+      
+      if (req.method === 'POST') {
+        console.log('Creating new schedule/event:', req.body);
+        const newEvent = {
+          ID: generateId('schedules'),
+          ...req.body
+        };
+        mockData.schedules.push(newEvent);
+        console.log('Event created successfully:', newEvent);
+        res.status(201).json({
+          success: true,
+          data: newEvent,
+          message: 'Event created successfully'
+        });
+        return;
+      }
+    }
+
+    // Individual resource routes
+    if (pathStr.startsWith('sports/')) {
+      const id = parseInt(pathStr.split('/')[1]);
+      
+      if (req.method === 'GET') {
+        const sport = findItemById(mockData.sports, id);
+        if (sport) {
+          res.status(200).json({
+            success: true,
+            data: sport
+          });
+          return;
+        }
+      }
+      
+      if (req.method === 'PUT') {
+        const index = findItemIndex(mockData.sports, id);
+        if (index !== -1) {
+          mockData.sports[index] = { ...mockData.sports[index], ...req.body };
+          res.status(200).json({
+            success: true,
+            data: mockData.sports[index],
+            message: 'Sport updated successfully'
+          });
+          return;
+        }
+      }
+      
+      if (req.method === 'DELETE') {
+        const index = findItemIndex(mockData.sports, id);
+        if (index !== -1) {
+          mockData.sports.splice(index, 1);
+          res.status(200).json({
+            success: true,
+            message: 'Sport deleted successfully'
+          });
+          return;
+        }
+      }
+    }
+
+    if (pathStr.startsWith('teams/')) {
+      const id = parseInt(pathStr.split('/')[1]);
+      
+      if (req.method === 'GET') {
+        const team = findItemById(mockData.teams, id);
+        if (team) {
+          res.status(200).json({
+            success: true,
+            data: team
+          });
+          return;
+        }
+      }
+      
+      if (req.method === 'PUT') {
+        const index = findItemIndex(mockData.teams, id);
+        if (index !== -1) {
+          mockData.teams[index] = { ...mockData.teams[index], ...req.body };
+          res.status(200).json({
+            success: true,
+            data: mockData.teams[index],
+            message: 'Team updated successfully'
+          });
+          return;
+        }
+      }
+      
+      if (req.method === 'DELETE') {
+        const index = findItemIndex(mockData.teams, id);
+        if (index !== -1) {
+          mockData.teams.splice(index, 1);
+          res.status(200).json({
+            success: true,
+            message: 'Team deleted successfully'
+          });
+          return;
+        }
+      }
+    }
+
+    // Handle individual medals routes (medals/:id)
+    if (pathStr.startsWith('medals/')) {
+      const id = parseInt(pathStr.split('/')[1]);
+      
+      if (req.method === 'GET') {
+        const medal = findItemById(mockData.medals, id);
+        if (medal) {
+          res.status(200).json({
+            success: true,
+            data: medal
+          });
+          return;
+        }
+      }
+      
+      if (req.method === 'PUT') {
+        const index = findItemIndex(mockData.medals, id);
+        if (index !== -1) {
+          mockData.medals[index] = { ...mockData.medals[index], ...req.body };
+          res.status(200).json({
+            success: true,
+            data: mockData.medals[index],
+            message: 'Medal updated successfully'
+          });
+          return;
+        }
+      }
+      
+      if (req.method === 'DELETE') {
+        const index = findItemIndex(mockData.medals, id);
+        if (index !== -1) {
+          mockData.medals.splice(index, 1);
+          res.status(200).json({
+            success: true,
+            message: 'Medal deleted successfully'
+          });
+          return;
+        }
+      }
+    }
+
+    // Handle individual players routes (players/:id)
+    if (pathStr.startsWith('players/')) {
+      const id = parseInt(pathStr.split('/')[1]);
+      
+      if (req.method === 'GET') {
+        const player = findItemById(mockData.players, id);
+        if (player) {
+          res.status(200).json({
+            success: true,
+            data: player
+          });
+          return;
+        }
+      }
+      
+      if (req.method === 'PUT') {
+        const index = findItemIndex(mockData.players, id);
+        if (index !== -1) {
+          mockData.players[index] = { ...mockData.players[index], ...req.body };
+          res.status(200).json({
+            success: true,
+            data: mockData.players[index],
+            message: 'Player updated successfully'
+          });
+          return;
+        }
+      }
+      
+      if (req.method === 'DELETE') {
+        const index = findItemIndex(mockData.players, id);
+        if (index !== -1) {
+          mockData.players.splice(index, 1);
+          res.status(200).json({
+            success: true,
+            message: 'Player deleted successfully'
+          });
+          return;
+        }
+      }
+    }
+
+    // Handle individual schedule routes (schedules/:id)
+    if (pathStr.startsWith('schedules/')) {
+      const id = parseInt(pathStr.split('/')[1]);
+      
+      if (req.method === 'GET') {
+        const schedule = findItemById(mockData.schedules, id);
+        if (schedule) {
+          res.status(200).json({
+            success: true,
+            data: schedule
+          });
+          return;
+        }
+      }
+      
+      if (req.method === 'PUT') {
+        console.log(`Updating schedule ${id}:`, req.body);
+        const index = findItemIndex(mockData.schedules, id);
+        if (index !== -1) {
+          mockData.schedules[index] = { ...mockData.schedules[index], ...req.body };
+          console.log('Schedule updated successfully:', mockData.schedules[index]);
+          res.status(200).json({
+            success: true,
+            data: mockData.schedules[index],
+            message: 'Schedule updated successfully'
+          });
+          return;
+        }
+      }
+      
+      if (req.method === 'DELETE') {
+        console.log(`Deleting schedule ${id}`);
+        const index = findItemIndex(mockData.schedules, id);
+        if (index !== -1) {
+          const deleted = mockData.schedules.splice(index, 1)[0];
+          console.log('Schedule deleted successfully:', deleted);
+          res.status(200).json({
+            success: true,
+            message: 'Schedule deleted successfully'
+          });
+          return;
+        }
       }
     }
 
