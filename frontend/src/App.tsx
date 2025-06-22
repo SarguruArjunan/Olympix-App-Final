@@ -15,6 +15,7 @@ import Leaderboard from './pages/Leaderboard';
 import Admin from './pages/Admin';
 import StarPlayers from './pages/StarPlayers';
 import Login from './pages/Login';
+import { registerServiceWorker, preloadCriticalImages, monitorImagePerformance } from './utils/imageOptimization';
 
 // Configure React Query client
 const queryClient = new QueryClient({
@@ -31,9 +32,30 @@ const queryClient = new QueryClient({
 });
 
 const App: React.FC = () => {
-  // Set document title on app load
+  // Initialize image optimization features
   useEffect(() => {
     document.title = "PowerSchool Olympix";
+    
+    // Register service worker for caching
+    registerServiceWorker();
+    
+    // Start performance monitoring
+    monitorImagePerformance();
+    
+    // Preload critical images
+    const criticalImages = [
+      '/Icons/basketball.svg',
+      '/Icons/cricket.svg',
+      '/Icons/chess.svg',
+      '/Icons/badminton.svg',
+      '/Icons/table-tennis.svg',
+      '/Icons/football.svg',
+      '/images/teams/classix.png'
+    ];
+    
+    preloadCriticalImages(criticalImages).catch(error => {
+      console.warn('Failed to preload some critical images:', error);
+    });
   }, []);
 
   return (

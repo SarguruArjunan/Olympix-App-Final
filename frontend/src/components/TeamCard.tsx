@@ -29,27 +29,27 @@ const TeamCard: React.FC<TeamCardProps> = memo(({
               className="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden border-2"
               style={{ borderColor: color }}
             >
-              {logoUrl ? (
-                <img 
-                  src={logoUrl} 
-                  alt={`${name} logo`}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                    const parent = (e.target as HTMLImageElement).parentElement;
-                    if (parent) {
-                      parent.innerHTML = `<div class="w-full h-full rounded-full flex items-center justify-center text-white font-bold text-xl" style="background-color: ${color}">${getTeamInitials(name)}</div>`;
-                    }
-                  }}
-                />
-              ) : (
-                <div 
-                  className="w-full h-full rounded-full flex items-center justify-center text-white font-bold text-xl"
-                  style={{ backgroundColor: color }}
-                >
+              <div
+                className="w-full h-full rounded-full flex items-center justify-center text-white font-bold text-xl"
+                style={{ backgroundColor: color }}
+              >
+                {logoUrl ? (
+                  <img
+                    src={logoUrl}
+                    alt={`${name} logo`}
+                    className="w-full h-full object-cover rounded-full"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                    onLoad={(e) => {
+                      e.currentTarget.style.display = 'block';
+                    }}
+                  />
+                ) : null}
+                <span className={logoUrl ? 'absolute' : ''}>
                   {getTeamInitials(name)}
-                </div>
-              )}
+                </span>
+              </div>
             </div>
           </div>
           

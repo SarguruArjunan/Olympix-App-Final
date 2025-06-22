@@ -1,7 +1,7 @@
 import app from './app';
 import { JsonService } from './services/json.service';
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 async function startServer() {
   try {

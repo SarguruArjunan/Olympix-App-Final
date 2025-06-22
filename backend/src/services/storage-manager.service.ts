@@ -132,3 +132,11 @@ export class StorageManagerService {
 
 // Initialize storage on import
 StorageManagerService.autoDetectStorage();
+
+// Add diagnostic logging
+console.log('🔍 STORAGE MANAGER DIAGNOSTICS:');
+console.log(`📊 Current storage mode: ${StorageManagerService.getCurrentEnvironment()}`);
+console.log(`🌍 Environment variables check:`);
+console.log(`   - POSTGRES_URL: ${process.env.POSTGRES_URL ? '✅ Set' : '❌ Not set'}`);
+console.log(`   - DATABASE_URL: ${process.env.DATABASE_URL ? '✅ Set' : '❌ Not set'}`);
+console.log(`   - NODE_ENV: ${process.env.NODE_ENV || 'undefined'}`);

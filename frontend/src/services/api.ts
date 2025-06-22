@@ -58,7 +58,7 @@ class ApiService {
     try {
       console.log(`🔄 ${context}: Attempting API call...`);
       const result = await apiCall();
-      console.log(`✅ ${context}: API call successful`);
+      console.log(`✅ ${context}: API call successful`, result);
       return result;
     } catch (error) {
       console.error(`❌ ${context}: API call failed`, error);

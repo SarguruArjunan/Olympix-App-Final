@@ -5,6 +5,7 @@ import { useTeam, useMedals, useSports, useTeams, usePlayers } from '../hooks/us
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import EmptyState from '../components/EmptyState';
+import BackButton from '../components/BackButton';
 import { formatDate, formatTime, findSportName, getTeamInitials } from '../utils/helpers';
 import { Event } from '../types';
 
@@ -71,6 +72,8 @@ const TeamDetail: React.FC = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4">
+      <BackButton to="/teams" label="Back to Teams" />
+      
       {/* Team Header */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-8">
         <div className="flex items-center gap-6">
@@ -78,28 +81,30 @@ const TeamDetail: React.FC = () => {
             className="w-24 h-24 rounded-full flex items-center justify-center overflow-hidden border-4"
             style={{ borderColor: team.Color }}
           >
-            {team.Logo_URL ? (
-              <img 
-                src={team.Logo_URL} 
-                alt={`${team.Name} logo`}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                  const parent = (e.target as HTMLImageElement).parentElement;
-                  if (parent) {
-                    parent.innerHTML = `<span class="text-3xl font-bold" style="color: ${team.Color}">${getTeamInitials(team.Name)}</span>`;
-                  }
-                }}
-              />
-            ) : (
-              <span className="text-3xl font-bold" style={{ color: team.Color }}>
+            <div
+              className="w-full h-full rounded-full flex items-center justify-center text-white font-bold text-3xl"
+              style={{ backgroundColor: team.Color }}
+            >
+              {team.Logo_URL ? (
+                <img
+                  src={team.Logo_URL}
+                  alt={`${team.Name} logo`}
+                  className="w-full h-full object-cover rounded-full"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                  onLoad={(e) => {
+                    e.currentTarget.style.display = 'block';
+                  }}
+                />
+              ) : null}
+              <span className={team.Logo_URL ? 'absolute' : ''}>
                 {getTeamInitials(team.Name)}
               </span>
-            )}
+            </div>
           </div>
           <div className="flex-1">
             <h1 className="text-4xl font-bold text-primary mb-2">{team.Name}</h1>
-            <p className="text-xl text-gray-600 mb-2">{team.Country}</p>
             <p className="text-sm text-gray-500 uppercase tracking-wide mb-2">{team.Organization}</p>
             <p className="text-gray-700 italic">"{team.TagLine}"</p>
           </div>

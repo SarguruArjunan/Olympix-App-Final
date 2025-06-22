@@ -43,7 +43,14 @@ app.get('/', (_req, res) => {
   });
 });
 
-// Health check endpoint for frontend status monitoring
+// API routes
+app.use('/api/v1/sports', sportsRouter);
+app.use('/api/v1/teams', teamsRouter);
+app.use('/api/v1/schedules', schedulesRouter);
+app.use('/api/v1/medals', medalsRouter);
+app.use('/api/v1/players', playersRouter);
+
+// Health check endpoint for frontend status monitoring (after routes)
 app.get('/api/v1/health', (_req, res) => {
   res.json({
     name: 'Olympix API',
@@ -53,12 +60,5 @@ app.get('/api/v1/health', (_req, res) => {
     timestamp: new Date().toISOString()
   });
 });
-
-// API routes
-app.use('/api/v1/sports', sportsRouter);
-app.use('/api/v1/teams', teamsRouter);
-app.use('/api/v1/schedules', schedulesRouter);
-app.use('/api/v1/medals', medalsRouter);
-app.use('/api/v1/players', playersRouter);
 
 export default app;

@@ -7,6 +7,8 @@ export const useSports = (options?: Partial<UseQueryOptions<Sport[], Error>>) =>
   return useQuery({
     queryKey: ['sports'],
     queryFn: () => apiService.getSports(),
+    staleTime: 1000 * 60 * 5, // 5 minutes - reasonable caching
+    gcTime: 1000 * 60 * 30, // 30 minutes - reasonable garbage collection
     ...options,
   });
 };

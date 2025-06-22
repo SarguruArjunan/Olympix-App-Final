@@ -2,7 +2,7 @@ import * as XLSX from 'xlsx';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { DATA_DIR } from '../app';
-import { SheetName } from '../types';
+// Removed unused import SheetName
 
 interface ConversionResult {
   success: boolean;
