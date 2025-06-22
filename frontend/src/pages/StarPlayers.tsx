@@ -165,7 +165,7 @@ const StarPlayers: React.FC = () => {
 
     // Apply current sorting based on selected field and direction
     return sortPlayers(sortedByScore);
-  }, [players, teams, sports, medals, sortField, sortDirection]);
+  }, [players, teams, sports, medals, sortPlayers]);
 
   const isLoading = playersLoading || teamsLoading || sportsLoading || medalsLoading;
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Medal } from '../types';
-import { useMedals, useCreateMedal, useUpdateMedal, useDeleteMedal, useTeams, useSports, useCreatePlayer, usePlayers, useDeletePlayer } from '../hooks/useApi';
+import { useMedals, useCreateMedal, useUpdateMedal, useDeleteMedal, useTeams, useSports, usePlayers, useDeletePlayer } from '../hooks/useApi';
 import LoadingSpinner from './LoadingSpinner';
 import ErrorMessage from './ErrorMessage';
 import EmptyState from './EmptyState';
@@ -25,7 +25,6 @@ const MedalsAdmin: React.FC = () => {
   const createMedalMutation = useCreateMedal();
   const updateMedalMutation = useUpdateMedal();
   const deleteMedalMutation = useDeleteMedal();
-  const createPlayerMutation = useCreatePlayer();
   const deletePlayerMutation = useDeletePlayer();
 
   const isLoading = medalsLoading || teamsLoading || sportsLoading || playersLoading;

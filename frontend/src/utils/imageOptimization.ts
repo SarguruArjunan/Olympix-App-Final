@@ -42,7 +42,7 @@ export const preloadCriticalImages = (imageUrls: string[]): Promise<void[]> => {
 
 // Generate WebP version URL if supported
 export const getOptimizedImageUrl = (originalUrl: string, config: ImageOptimizationConfig = {}): string => {
-  const { format = 'auto', quality = 80 } = config;
+  const { format = 'auto' } = config;
   
   // Check WebP support
   const supportsWebP = (() => {

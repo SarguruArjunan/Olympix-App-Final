@@ -126,7 +126,7 @@ const Leaderboard: React.FC = () => {
 
     // Apply current sorting based on selected field and direction
     return sortTeams(olympicSorted);
-  }, [teams, medals, sortField, sortDirection]);
+  }, [teams, medals, sortTeams]);
 
   const isLoading = teamsLoading || medalsLoading;
   const error = teamsError || medalsError;
