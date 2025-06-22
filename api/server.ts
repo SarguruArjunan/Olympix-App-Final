@@ -27,18 +27,31 @@ const mockData = {
 
 // Production API with proper routing
 export default function handler(req: VercelRequest, res: VercelResponse) {
+  // DEBUGGING: Log all incoming requests
+  console.log('=== API REQUEST DEBUG ===');
+  console.log('Method:', req.method);
+  console.log('URL:', req.url);
+  console.log('Query:', req.query);
+  console.log('Body:', req.body);
+  console.log('Headers:', req.headers);
+  console.log('========================');
+
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
+    console.log('CORS preflight request - responding with 200');
     res.status(200).end();
     return;
   }
 
   const { path } = req.query;
   const pathStr = Array.isArray(path) ? path.join('/') : path || '';
+  
+  console.log('Processed path:', pathStr);
+  console.log('Request method:', req.method);
 
   try {
     // Route handling
@@ -120,18 +133,25 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Default response for unknown routes
+    console.log(`ROUTE NOT FOUND: ${req.method} ${pathStr}`);
+    console.log('Available routes:', ['health', 'sports', 'teams', 'medals', 'players', 'schedules']);
+    
     res.status(200).json({
       success: true,
-      message: `Route not implemented: ${pathStr}`,
+      message: `Route not implemented: ${req.method} ${pathStr}`,
       availableRoutes: ['health', 'sports', 'teams', 'medals', 'players', 'schedules'],
+      requestMethod: req.method,
+      requestPath: pathStr,
       timestamp: new Date().toISOString()
     });
 
   } catch (error) {
+    console.error('API Error:', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
-      message: error instanceof Error ? error.message : 'Unknown error'
+      message: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
     });
   }
 }
