@@ -1,34 +1,44 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 
-// Mock API data with in-memory storage
-const mockData = {
+// Real data from Excel/JSON files
+const realData = {
   sports: [
-    { ID: 1, Name: "Basketball", Description: "Fast-paced team sport", Icon_URL: "/Icons/basketball.svg" },
-    { ID: 2, Name: "Cricket", Description: "Popular bat-and-ball game", Icon_URL: "/Icons/cricket.svg" },
+    { ID: 1, Name: "Foosball", Description: "Table football game", Icon_URL: "/Icons/foosball.svg" },
+    { ID: 2, Name: "Carrom", Description: "Traditional board game", Icon_URL: "/Icons/carrom.svg" },
     { ID: 3, Name: "Chess", Description: "Strategic board game", Icon_URL: "/Icons/chess.svg" },
-    { ID: 4, Name: "Badminton", Description: "Racquet sport with shuttlecock", Icon_URL: "/Icons/badminton.svg" },
-    { ID: 5, Name: "Table Tennis", Description: "Indoor racquet sport", Icon_URL: "/Icons/table-tennis.svg" },
-    { ID: 6, Name: "Football", Description: "Most popular sport worldwide", Icon_URL: "/Icons/football.svg" },
-    { ID: 7, Name: "Carrom", Description: "Traditional board game", Icon_URL: "/Icons/carrom.svg" },
-    { ID: 8, Name: "Foosball", Description: "Table football game", Icon_URL: "/Icons/foosball.svg" }
+    { ID: 4, Name: "Table Tennis", Description: "Indoor racquet sport", Icon_URL: "/Icons/table-tennis.svg" },
+    { ID: 5, Name: "Badminton", Description: "Racquet sport with shuttlecock", Icon_URL: "/Icons/badminton.svg" },
+    { ID: 6, Name: "Cricket", Description: "Popular bat-and-ball game", Icon_URL: "/Icons/cricket.svg" },
+    { ID: 7, Name: "Football", Description: "Most popular sport worldwide", Icon_URL: "/Icons/football.svg" },
+    { ID: 8, Name: "Basketball", Description: "Fast-paced team sport", Icon_URL: "/Icons/basketball.svg" },
+    { ID: 9, Name: "Lemon Spoon Race", Description: "Fun balancing race", Icon_URL: "/Icons/lemon-spoon.svg" }
   ],
   teams: [
-    { ID: 1, Name: "Classix Champions", Country: "India", Logo_URL: "/images/teams/classix.png", Organization: "PowerSchool", TagLine: "Excellence in Competition", Color: "#FF6B6B" },
-    { ID: 2, Name: "Thunder Bolts", Country: "India", Logo_URL: "/images/teams/thunder.png", Organization: "PowerSchool", TagLine: "Strike Like Lightning", Color: "#4ECDC4" },
-    { ID: 3, Name: "Fire Hawks", Country: "India", Logo_URL: "/images/teams/fire-hawks.png", Organization: "PowerSchool", TagLine: "Soaring to Victory", Color: "#FF9F43" },
-    { ID: 4, Name: "Ocean Warriors", Country: "India", Logo_URL: "/images/teams/ocean-warriors.png", Organization: "PowerSchool", TagLine: "Riding the Waves", Color: "#3742FA" },
-    { ID: 5, Name: "Green Guardians", Country: "India", Logo_URL: "/images/teams/green-guardians.png", Organization: "PowerSchool", TagLine: "Protecting Our Future", Color: "#2ED573" },
-    { ID: 6, Name: "Golden Eagles", Country: "India", Logo_URL: "/images/teams/golden-eagles.png", Organization: "PowerSchool", TagLine: "Flying High", Color: "#FFA726" }
+    { ID: 1, Name: "Success Squad", Country: "USA", Logo_URL: "/images/teams/success-squad.png", Organization: "Enablement & Success", TagLine: "Game On,CustGrSnss", Color: "#000000" },
+    { ID: 2, Name: "BkNdBoss", Country: "India", Logo_URL: "/images/teams/bkndboss.png", Organization: "G&A", TagLine: "Game On,BkNd Strong!", Color: "#8B4513" },
+    { ID: 3, Name: "Olympus", Country: "USA", Logo_URL: "/images/teams/olympus.png", Organization: "Hosting & Security", TagLine: "Power of Gods", Color: "#800080" },
+    { ID: 4, Name: "ClassIX", Country: "Canada", Logo_URL: "/images/teams/classix.png", Organization: "Classroom", TagLine: "Raw Skill, Pure Class", Color: "#FF8C00" },
+    { ID: 5, Name: "KRR", Country: "UK", Logo_URL: "/images/teams/krr.png", Organization: "Compliance", TagLine: "Rise Rally Reign", Color: "#808080" },
+    { ID: 6, Name: "CoreForce", Country: "Australia", Logo_URL: "/images/teams/coreforce.png", Organization: "PS SIS+", TagLine: "Unleash Our Core Power", Color: "#FF0000" },
+    { ID: 7, Name: "PhoenIX", Country: "India", Logo_URL: "/images/teams/phoenix.png", Organization: "UI&DS", TagLine: "Honor, Fire, Victory", Color: "#008000" },
+    { ID: 8, Name: "NUM1", Country: "USA", Logo_URL: "/images/teams/num1.png", Organization: "UT&CCLR", TagLine: "United for Success", Color: "#00CED1" },
+    { ID: 9, Name: "ERP Blaze", Country: "Germany", Logo_URL: "/images/teams/erp-blaze.png", Organization: "ERP & HED R&D", TagLine: "Elevate Radiate Power", Color: "#000080" },
+    { ID: 10, Name: "On Point", Country: "India", Logo_URL: "/images/teams/on-point.png", Organization: "Services", TagLine: "Swift Sharp Strong", Color: "#FFFF00" },
+    { ID: 11, Name: "Warriors", Country: "USA", Logo_URL: "/images/teams/warriors.png", Organization: "Support 1", TagLine: "Built to Battle", Color: "#FF69B4" },
+    { ID: 12, Name: "Knights", Country: "Canada", Logo_URL: "/images/teams/knights.png", Organization: "Support 2", TagLine: "Lead with Power", Color: "#008B8B" }
   ],
   medals: [],
   players: [],
   schedules: []
 };
 
+// Use real data instead of mock data
+const mockData = realData;
+
 // Helper functions for CRUD operations
 let nextId = {
-  sports: 9,
-  teams: 7,
+  sports: 10, // Next ID after the 9 existing sports
+  teams: 13,  // Next ID after the 12 existing teams
   medals: 1,
   players: 1,
   schedules: 1
